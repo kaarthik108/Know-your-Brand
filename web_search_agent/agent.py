@@ -19,12 +19,28 @@ class MentionResult(BaseModel):
     ethical_context: Optional[str] = Field(description="Any ethical context identified", default=None)
     url: Optional[str] = Field(description="URL to the original mention", default=None)
 
+class PlatformMentions(BaseModel):
+    name: str = Field(description="Platform name")
+    mentions: List[MentionResult] = Field(description="List of mentions on this platform")
+
+class SentimentBreakdown(BaseModel):
+    positive: float = Field(description="Percentage of positive mentions")
+    negative: float = Field(description="Percentage of negative mentions")
+    neutral: float = Field(description="Percentage of neutral mentions")
+    count: Optional[int] = Field(description="Total count for this platform", default=None)
+
+class WordCloudTheme(BaseModel):
+    word: str = Field(description="Theme word for word cloud")
+    weight: int = Field(description="Weight/frequency of the word to determine display size")
+
 class MentionSummary(BaseModel):
     brand_name: str
     total_mentions: int
-    sentiment_breakdown: dict
+    overall_sentiment: SentimentBreakdown
+    platform_sentiment: dict[str, SentimentBreakdown]
     ethical_highlights: List[str]
-    detailed_mentions: List[MentionResult]
+    word_cloud_themes: List[WordCloudTheme]
+    platforms: List[PlatformMentions]
 
 model = LiteLlm(
     model="gpt-4.1-mini",
@@ -381,10 +397,11 @@ analysis_agent = LlmAgent(
     instruction="""
 You are a brand reputation analyst. Your task is to:
 1. Review all the brand mentions collected from different platforms
-2. Analyze the overall sentiment (calculate percentages of positive/negative/neutral)
+2. Analyze the overall sentiment and per-platform sentiment breakdowns
 3. Identify key ethical themes or issues mentioned
-4. Highlight the most significant mentions that require attention
-5. Provide a comprehensive summary with structured data
+4. Extract important theme words (nouns, verbs, adjectives) for word cloud visualization
+5. Aggregate mentions by platform
+6. Provide a comprehensive summary with structured data
 
 The aggregated mentions from all platforms are available as a JSON array:
 Twitter/X: {twitter_results} \n\n
@@ -394,22 +411,95 @@ News: {news_results} \n\n
 
 Analyze these mentions and provide your insights following this structure:
 {
-"brand_name": "the brand name",
-"total_mentions": number of mentions found,
-"sentiment_breakdown": {
-"positive": percentage (as number),
-"negative": percentage (as number),
-"neutral": percentage (as number)
-},
-"ethical_highlights": [
-"key ethical theme 1",
-"key ethical theme 2",
-etc.
-],
-"detailed_mentions": [
-// Include the most relevant/important mentions from the data
-]
+  "brand_name": "the brand name",
+  "total_mentions": number of mentions found,
+  "overall_sentiment": {
+    "positive": percentage (as number),
+    "negative": percentage (as number),
+    "neutral": percentage (as number)
+  },
+  "platform_sentiment": {
+    "Twitter": {
+      "positive": percentage (as number),
+      "negative": percentage (as number),
+      "neutral": percentage (as number),
+      "count": total count for this platform
+    },
+    "LinkedIn": {
+      "positive": percentage (as number),
+      "negative": percentage (as number),
+      "neutral": percentage (as number),
+      "count": total count for this platform
+    },
+    "Reddit": {
+      "positive": percentage (as number),
+      "negative": percentage (as number),
+      "neutral": percentage (as number),
+      "count": total count for this platform
+    },
+    "News": {
+      "positive": percentage (as number),
+      "negative": percentage (as number),
+      "neutral": percentage (as number),
+      "count": total count for this platform
+    }
+  },
+  "ethical_highlights": [
+    "key ethical theme 1",
+    "key ethical theme 2",
+    etc.
+  ],
+  "word_cloud_themes": [
+    {
+      "word": "theme_word_1",
+      "weight": frequency/importance score (higher number = larger display)
+    },
+    {
+      "word": "theme_word_2",
+      "weight": frequency/importance score
+    },
+    etc.
+  ],
+  "platforms": [
+    {
+      "name": "Twitter",
+      "mentions": [
+        {
+          "date": "date of mention",
+          "text": "content of mention",
+          "sentiment": "sentiment of mention",
+          "ethical_context": "ethical context",
+          "url": "url to the mention"
+        },
+        etc.
+      ]
+    },
+    {
+      "name": "LinkedIn",
+      "mentions": [
+        etc.
+      ]
+    },
+    {
+      "name": "Reddit",
+      "mentions": [
+        etc.
+      ]
+    },
+    {
+      "name": "News",
+      "mentions": [
+        etc.
+      ]
+    }
+  ]
 }
+
+For the word_cloud_themes, extract at least 30 significant nouns, verbs, and adjectives from all the mentions that represent key themes, product features, corporate activities, ethical concerns, etc. For each word:
+1. Calculate its weight based on frequency (how many times it appears across all mentions)
+2. Assign higher weights to words that appear in mention titles or are emphasized
+3. Use a scale of 1-10 where 10 represents the most frequent/important words
+4. Include a diverse range of words related to different aspects (product, ethics, business, etc.)
 
 Make sure your response is valid JSON that can be parsed.
     """,
@@ -421,7 +511,12 @@ Make sure your response is valid JSON that can be parsed.
 main_agent = Agent(
     name="web_search_agent",
     model=model,
-    description="You are a brand monitoring agent. Your task is to monitor the brand mentions across multiple platforms and provide a comprehensive summary of the mentions, use different agents when you need to analyze different brands First route the agent platform_search_agent to search for mentions across multiple platforms and then route the agent analysis_agent to analyze the mentions and provide a comprehensive summary of the mentions",
+    description="You are a brand monitoring agent. Your task is to monitor the brand mentions across multiple platforms and provide a comprehensive summary of the mentions",
+    instruction="""
+    You are a brand monitoring agent. Your task is to monitor the brand mentions across multiple platforms and provide a comprehensive summary of the mentions, use different agents when you need to analyze different brands First route the agent platform_search_agent to search for mentions across multiple platforms and then route the agent analysis_agent to analyze the mentions and provide a comprehensive summary of the mentions
+
+    Delegate to the platform_search_agent to search for mentions across multiple platforms and then delegate to the analysis_agent to analyze the mentions and provide a comprehensive summary of the mentions, if for normal queries just reply directly to the user.
+    """,
     sub_agents=[platform_search_agent, analysis_agent]
 )
 
