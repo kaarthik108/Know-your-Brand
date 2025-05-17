@@ -1,52 +1,57 @@
 import os
 from google.adk.agents import LlmAgent, ParallelAgent, Agent, LoopAgent
-from pydantic import BaseModel, Field
-from typing import List, Optional
+from pydantic import BaseModel, HttpUrl
+from typing import List, Dict, Literal
 from google.adk.models.lite_llm import LiteLlm
 from google.adk.tools import ToolContext
 from .tool_helper import search_web
-
-class BrandSearchInput(BaseModel):
-    brand_name: str = Field(description="Name of the brand or company to monitor")
-    category: Optional[str] = Field(description="Business category or industry", default=None)
-    location: Optional[str] = Field(description="Geographic location of interest", default=None)
-
-class MentionResult(BaseModel):
-    platform: str = Field(description="The platform where the mention was found")
-    date: str = Field(description="Date of the mention")
-    text: str = Field(description="The actual text of the mention")
-    sentiment: str = Field(description="Sentiment analysis (positive, negative, neutral)")
-    ethical_context: Optional[str] = Field(description="Any ethical context identified", default=None)
-    url: Optional[str] = Field(description="URL to the original mention", default=None)
-
-class PlatformMentions(BaseModel):
-    name: str = Field(description="Platform name")
-    mentions: List[MentionResult] = Field(description="List of mentions on this platform")
-
 class SentimentBreakdown(BaseModel):
-    positive: float = Field(description="Percentage of positive mentions")
-    negative: float = Field(description="Percentage of negative mentions")
-    neutral: float = Field(description="Percentage of neutral mentions")
-    count: Optional[int] = Field(description="Total count for this platform", default=None)
+    positive: float
+    negative: float
+    neutral: float
+
+class PlatformSentiment(SentimentBreakdown):
+    count: int
 
 class WordCloudTheme(BaseModel):
-    word: str = Field(description="Theme word for word cloud")
-    weight: int = Field(description="Weight/frequency of the word to determine display size")
+    word: str
+    weight: float
 
-class MentionSummary(BaseModel):
+class Mention(BaseModel):
+    date: str
+    text: str
+    sentiment: Literal["positive", "negative", "neutral"]
+    ethical_context: str
+    url: HttpUrl
+
+class PlatformMentions(BaseModel):
+    name: Literal["Twitter", "LinkedIn", "Reddit", "News"]
+    mentions: List[Mention]
+
+class BrandSentimentReport(BaseModel):
     brand_name: str
     total_mentions: int
     overall_sentiment: SentimentBreakdown
-    platform_sentiment: dict[str, SentimentBreakdown]
+    platform_sentiment: Dict[Literal["Twitter", "LinkedIn", "Reddit", "News"], PlatformSentiment]
     ethical_highlights: List[str]
     word_cloud_themes: List[WordCloudTheme]
     platforms: List[PlatformMentions]
 
-model = LiteLlm(
+model_mini = LiteLlm(
     model="gpt-4.1-mini",
     api_key=os.getenv("OPENAI_API_KEY"),
 )
+model = LiteLlm(
+    model="gpt-4.1",
+    api_key=os.getenv("OPENAI_API_KEY"),
+    temperature=0.01
+)
 # model = 'gemini-2.5-flash-preview-04-17'
+
+model_groq = LiteLlm(
+    model="groq/llama-3.3-70b-versatile",
+    api_key=os.getenv("GROQ_API_KEY"),
+)
 
 def exit_loop(tool_context: ToolContext):
   """Call this function ONLY when the critique indicates no further changes are needed, signaling the iterative process should end."""
@@ -59,7 +64,7 @@ def exit_loop(tool_context: ToolContext):
 
 # Create platform-specific search agents
 twitter_agent = LlmAgent(
-    model=model,
+    model=model_mini,
     name='twitter_search_agent',
     description="Searches Twitter/X for recent brand mentions",
     instruction="""
@@ -136,7 +141,7 @@ twitter_loop_agent = LoopAgent(
 )
 
 linkedin_agent = LlmAgent(
-    model=model,
+    model=model_mini,
     name='linkedin_search_agent',
     description="Searches LinkedIn for recent brand mentions",
     instruction="""
@@ -214,7 +219,7 @@ linkedin_loop_agent = LoopAgent(
 )
 
 reddit_agent = LlmAgent(
-    model=model,
+    model=model_mini,
     name='reddit_search_agent',
     description="Searches Reddit for recent brand mentions",
     instruction="""
@@ -296,7 +301,7 @@ reddit_loop_agent = LoopAgent(
 )
 
 news_agent = LlmAgent(
-    model=model,
+    model=model_mini,
     name='news_search_agent',
     description="Searches news sites for recent brand mentions",
     instruction="""
@@ -501,9 +506,11 @@ For the word_cloud_themes, extract at least 30 significant nouns, verbs, and adj
 3. Use a scale of 1-10 where 10 represents the most frequent/important words
 4. Include a diverse range of words related to different aspects (product, ethics, business, etc.)
 
+IMPORTANT: ALL THE FIELDS MUST BE IN DOUBLE QUOTES BOTH (KEYS AND VALUES)
+
 Make sure your response is valid JSON that can be parsed.
     """,
-    output_schema=MentionSummary,
+    output_schema=BrandSentimentReport,
     output_key="analysis_results"
 )
 

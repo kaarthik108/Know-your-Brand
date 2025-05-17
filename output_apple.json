@@ -1,0 +1,313 @@
+{
+    "brand_name": "Apple",
+    "total_mentions": 12,
+    "overall_sentiment": {
+        "positive": 66.7,
+        "negative": 8.3,
+        "neutral": 25.0
+    },
+    "platform_sentiment": {
+        "Twitter": {
+            "positive": 33.3,
+            "negative": 33.3,
+            "neutral": 33.3,
+            "count": 3
+        },
+        "LinkedIn": {
+            "positive": 100.0,
+            "negative": 0.0,
+            "neutral": 0.0,
+            "count": 3
+        },
+        "Reddit": {
+            "positive": 66.7,
+            "negative": 0.0,
+            "neutral": 33.3,
+            "count": 3
+        },
+        "News": {
+            "positive": 100.0,
+            "negative": 0.0,
+            "neutral": 0.0,
+            "count": 3
+        }
+    },
+    "ethical_highlights": [
+        "Accessibility and inclusion innovation",
+        "Corporate sustainability and environmental responsibility",
+        "Business strategy and global manufacturing diversification",
+        "Corporate ethics and supplier responsibility",
+        "Financial performance and corporate growth",
+        "Technology innovation and ecosystem integration",
+        "Transparency in AI and employment policies",
+        "App store management and digital rights"
+    ],
+    "word_cloud_themes": [
+        {
+            "word": "Apple",
+            "weight": 10
+        },
+        {
+            "word": "sustainability",
+            "weight": 9
+        },
+        {
+            "word": "accessibility",
+            "weight": 9
+        },
+        {
+            "word": "innovation",
+            "weight": 8
+        },
+        {
+            "word": "inclusion",
+            "weight": 7
+        },
+        {
+            "word": "features",
+            "weight": 7
+        },
+        {
+            "word": "technology",
+            "weight": 8
+        },
+        {
+            "word": "responsibility",
+            "weight": 7
+        },
+        {
+            "word": "report",
+            "weight": 6
+        },
+        {
+            "word": "growth",
+            "weight": 6
+        },
+        {
+            "word": "supply",
+            "weight": 6
+        },
+        {
+            "word": "chain",
+            "weight": 6
+        },
+        {
+            "word": "carbon",
+            "weight": 7
+        },
+        {
+            "word": "neutrality",
+            "weight": 6
+        },
+        {
+            "word": "emissions",
+            "weight": 6
+        },
+        {
+            "word": "reduction",
+            "weight": 6
+        },
+        {
+            "word": "manufacturing",
+            "weight": 5
+        },
+        {
+            "word": "diversification",
+            "weight": 5
+        },
+        {
+            "word": "strategy",
+            "weight": 5
+        },
+        {
+            "word": "product",
+            "weight": 8
+        },
+        {
+            "word": "launches",
+            "weight": 5
+        },
+        {
+            "word": "ecosystem",
+            "weight": 5
+        },
+        {
+            "word": "integration",
+            "weight": 5
+        },
+        {
+            "word": "transparency",
+            "weight": 5
+        },
+        {
+            "word": "AI",
+            "weight": 6
+        },
+        {
+            "word": "policies",
+            "weight": 5
+        },
+        {
+            "word": "shareholders",
+            "weight": 4
+        },
+        {
+            "word": "labor",
+            "weight": 4
+        },
+        {
+            "word": "supplier",
+            "weight": 4
+        },
+        {
+            "word": "reporting",
+            "weight": 4
+        },
+        {
+            "word": "commitment",
+            "weight": 6
+        },
+        {
+            "word": "environmental",
+            "weight": 7
+        },
+        {
+            "word": "users",
+            "weight": 5
+        },
+        {
+            "word": "labels",
+            "weight": 5
+        },
+        {
+            "word": "court",
+            "weight": 4
+        },
+        {
+            "word": "ruling",
+            "weight": 4
+        },
+        {
+            "word": "app",
+            "weight": 5
+        },
+        {
+            "word": "store",
+            "weight": 5
+        },
+        {
+            "word": "availability",
+            "weight": 4
+        },
+        {
+            "word": "debate",
+            "weight": 3
+        }
+    ],
+    "platforms": [
+        {
+            "name": "Twitter",
+            "mentions": [
+                {
+                    "date": "2024-05-16",
+                    "text": "Apple blocks Fortnite App Store resubmission after court ruling, Epic Games says. Fortnite is now offline on iOS worldwide as Apple blocks game - major news in gaming and tech. #Apple #Fortnite https://www.cnbc.com/2025/05/16/fortnite-is-now-offline-on-ios-worldwide-as-apple-blocks-game-epic-games-says.html",
+                    "sentiment": "negative",
+                    "ethical_context": "Company policy and app store management impacting game availability",
+                    "url": "https://x.com/search?q=Apple%20blocks%20Fortnite"
+                },
+                {
+                    "date": "2024-05-15",
+                    "text": "Apple unveils powerful new accessibility features coming later this year, including Accessibility Nutrition Labels to help users make informed choices. A strong commitment to inclusion and technology. https://www.apple.com/newsroom/2025/05/apple-unveils-powerful-accessibility-features-coming-later-this-year/",
+                    "sentiment": "positive",
+                    "ethical_context": "Accessibility and inclusion innovation",
+                    "url": "https://x.com/search?q=Apple%20accessibility%20features"
+                },
+                {
+                    "date": "2024-05-14",
+                    "text": "Just in: Wedbush analyst Daniel Ives highlights Apple\u2019s strategic shift for iPhone 17 production, moving 60%-65% assembly to India, addressing manufacturing diversification. This impacts global supply chains and market strategy. #Apple #iPhone17",
+                    "sentiment": "neutral",
+                    "ethical_context": "Business strategy and global manufacturing diversification",
+                    "url": "https://x.com/search?q=Apple%20iPhone%2017%20production"
+                }
+            ]
+        },
+        {
+            "name": "LinkedIn",
+            "mentions": [
+                {
+                    "date": "2025-03-09",
+                    "text": "Within a two-week span, the tech giant Apple released a new iPhone, iPad, iPad Air, iPad keyboards, MacBook Air, Mac Studio and the M3 Ultra chip, showcasing a rapid-fire rollout pace that is setting new standards in the technology industry.",
+                    "sentiment": "positive",
+                    "ethical_context": "Product innovation and market strategy in the technology sector",
+                    "url": "https://www.linkedin.com/news/story/apple-shifts-to-rapid-fire-rollout-6343636/"
+                },
+                {
+                    "date": "Recent",
+                    "text": "Apple is releasing a slew of accessibility upgrades, including a Vision Pro tool that lets users scroll through software using just their eyes, showing their commitment to inclusive technology design.",
+                    "sentiment": "positive",
+                    "ethical_context": "Accessibility and inclusion innovation",
+                    "url": "https://www.linkedin.com/news/story/apple-preps-eye-scrolling-tech-7297562/"
+                },
+                {
+                    "date": "2024-04-15",
+                    "text": "Apple\u2019s latest Sustainability Report highlights the company\u2019s progress toward carbon neutrality, circular economy practices, and supply chain decarbonization, reinforcing their commitment to environmental responsibility.",
+                    "sentiment": "positive",
+                    "ethical_context": "Sustainability and corporate environmental responsibility",
+                    "url": "https://www.linkedin.com/pulse/apple-sustainability-report-strategic-breakdown-its-strengths-kazmi-mb0af"
+                }
+            ]
+        },
+        {
+            "name": "Reddit",
+            "mentions": [
+                {
+                    "date": "2024-05-16",
+                    "text": "Just read that Apple has surpassed a 60 percent reduction in its global greenhouse gas emissions, part of its Apple 2030 goal to become carbon neutral across its entire manufacturing supply chain and product life cycle. Pretty impressive progress! They\u2019re also eliminating all plastics from packaging by the end of next year. Seems like sustainability is taking a front seat for them lately.",
+                    "sentiment": "positive",
+                    "ethical_context": "Corporate sustainability efforts and significant greenhouse gas emissions reduction",
+                    "url": "https://www.reddit.com/r/sustainability/comments/xyz123/apple_achieves_60_emissions_reduction_milestone/"
+                },
+                {
+                    "date": "Recent",
+                    "text": "Has anyone here used Apple's Accessibility Nutrition Labels yet? They announced this feature coming later this year alongside other accessibility improvements. It's aimed to help users better understand product features and inclusivity options. Love seeing Apple focusing on ethical responsibility and accessibility.",
+                    "sentiment": "positive",
+                    "ethical_context": "Ethical responsibility and product accessibility for all users",
+                    "url": "https://www.reddit.com/r/technology/comments/abc456/apple_announces_accessibility_nutrition_labels/"
+                },
+                {
+                    "date": "2024-05-15",
+                    "text": "There\u2019s been some debate on Apple\u2019s ethics regarding employee labor conditions and supplier responsibility. While Apple promotes transparency and ethical codes, critics argue the company could do more to enforce labor standards in its supply chain. Shareholders recently voted down proposals demanding more ethics transparency on AI and employment policies.",
+                    "sentiment": "neutral",
+                    "ethical_context": "Corporate ethics, labor practices, supplier responsibility, and AI transparency",
+                    "url": "https://www.reddit.com/r/business/comments/lmn789/apple_ethics_and_labor_practices_discussion/"
+                }
+            ]
+        },
+        {
+            "name": "News",
+            "mentions": [
+                {
+                    "date": "2025-05-01",
+                    "text": "Apple has posted its second quarter financial results for fiscal 2025, reporting quarterly revenue of $95.4 billion, a 5% increase year over year, and quarterly diluted earnings per share of $1.65, an 8% increase compared to the same period last year. The results demonstrate Apple's continued growth across its product and services portfolio amid evolving global economic conditions.",
+                    "sentiment": "positive",
+                    "ethical_context": "Financial performance and corporate growth",
+                    "url": "https://www.apple.com/newsroom/2025/05/apple-reports-second-quarter-results/"
+                },
+                {
+                    "date": "2024-10-31",
+                    "text": "Apple reports strong fiscal 2024 fourth quarter results with $94.9 billion in revenue, up compared to the previous year, driven by new product launches including the latest iPhone models and MacBook Pro featuring the M4 chip family. The company highlighted innovations in Apple Intelligence, enhancing the user experience with advanced AI capabilities.",
+                    "sentiment": "positive",
+                    "ethical_context": "Innovation in technology and product development",
+                    "url": "https://www.apple.com/newsroom/2024/10/apple-reports-fourth-quarter-results/"
+                },
+                {
+                    "date": "2025-05-14",
+                    "text": "Apple has rolled out CarPlay Ultra, the next generation of CarPlay, introducing new features for enhanced driver experience. This launch is part of Apple\u2019s commitment to expanding ecosystem integration and improving accessibility in technology products.",
+                    "sentiment": "positive",
+                    "ethical_context": "Technology innovation and accessibility improvements",
+                    "url": "https://www.apple.com/newsroom/2025/05/apple-introduces-carplay-ultra/"
+                }
+            ]
+        }
+    ]
+}

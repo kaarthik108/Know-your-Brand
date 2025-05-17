@@ -3,7 +3,7 @@ import dotenv
 
 from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParameters
 
-dotenv.load_dotenv()
+dotenv.load_dotenv('.env')
 
 async def execute_tool(tool, args):
     """Execute a single tool and handle cleanup."""
@@ -35,7 +35,12 @@ def create_mcp_tool_executor(command, args=None, env=None):
         tools, exit_stack = await MCPToolset.from_server(
             connection_params=StdioServerParameters(
                 command='npx',
-                args=["-y", "@brightdata/mcp"]
+                args=["-y", "@brightdata/mcp"],
+                env={
+                    "API_TOKEN": os.getenv("MCP_TOKEN"),
+                    "WEB_UNLOCKER_ZONE": "web_unlocker1",
+                    # "BROWSER_AUTH": "SBR_USER:SBR_PASS"
+                }
             )
         )
         try:
@@ -49,12 +54,7 @@ def create_mcp_tool_executor(command, args=None, env=None):
 # Create our web search function
 search_web = create_mcp_tool_executor(
     command="mcp-web-search",
-    args=[],
-    env={
-        "API_TOKEN": os.getenv("MCP_TOKEN"),
-        "WEB_UNLOCKER_ZONE": "web_unlocker1",
-        # "BROWSER_AUTH": "SBR_USER:SBR_PASS"
-    }
+    args=[]
 )
 
 search_web.__name__ = "search_web"
