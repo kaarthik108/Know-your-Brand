@@ -1,20 +1,16 @@
-FROM public.ecr.aws/lambda/python:3.11
-
-WORKDIR ${LAMBDA_TASK_ROOT}
+FROM python:3.13-slim
+WORKDIR /app
 
 COPY requirements.txt .
-COPY main.py .
-COPY custom_database_service.py .
-COPY adk/ ./adk/
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install tar and gzip (required by uv installer), then install uv
-RUN yum install -y tar gzip && \
-    curl -LsSf https://astral.sh/uv/install.sh | sh
+RUN adduser --disabled-password --gecos "" myuser && \
+    chown -R myuser:myuser /app
 
-# Add uv to PATH
-ENV PATH="/root/.local/bin:$PATH"
+COPY . .
 
-# Install dependencies using uv
-RUN uv pip install -r requirements.txt --target ${LAMBDA_TASK_ROOT} --no-cache-dir
+USER myuser
 
-CMD ["main.lambda_handler"]
+ENV PATH="/home/myuser/.local/bin:$PATH"
+
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port $PORT"]
