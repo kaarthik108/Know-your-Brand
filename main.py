@@ -21,6 +21,7 @@ SERVE_WEB_INTERFACE = True # Assuming you might want a web interface
 # The ADK will look for agent packages (like web_search_agent) within AGENT_DIR
 app: FastAPI = get_fast_api_app(
     agent_dir=AGENT_DIR, # Directory containing agent packages
+    session_db_url=SESSION_DB_URL,
     allow_origins=ALLOWED_ORIGINS,
     web=SERVE_WEB_INTERFACE,
     # If your agent package is not directly named 'agent' or 'root_agent'
