@@ -11,17 +11,20 @@ from google.adk.cli.fast_api import get_fast_api_app
 AGENT_DIR = os.path.dirname(os.path.abspath(__file__))
 # Example session DB URL (e.g., SQLite)
 # Ensure sessions.db is in a writable location or adjust path
-SESSION_DB_URL = "sqlite:///./sessions.db"
+# SESSION_DB_URL = "sqlite:///./sessions.db"
 # Example allowed origins for CORS
 ALLOWED_ORIGINS = ["*"] # Keeping this as per your setup
 # Set web=True if you intend to serve a web interface, False otherwise
 SERVE_WEB_INTERFACE = True # Assuming you might want a web interface
 
+if os.getenv("SESSION_DB_URL") is None:
+    raise ValueError("SESSION_DB_URL is not set")
+
 # Call the function to get the FastAPI app instance
 # The ADK will look for agent packages (like web_search_agent) within AGENT_DIR
 app: FastAPI = get_fast_api_app(
     agent_dir=AGENT_DIR, # Directory containing agent packages
-    session_db_url=SESSION_DB_URL,
+    session_db_url=os.getenv("SESSION_DB_URL"),
     allow_origins=ALLOWED_ORIGINS,
     web=SERVE_WEB_INTERFACE,
     # If your agent package is not directly named 'agent' or 'root_agent'
