@@ -11,7 +11,7 @@ from google.adk.cli.fast_api import get_fast_api_app
 AGENT_DIR = os.path.dirname(os.path.abspath(__file__))
 # Example session DB URL (e.g., SQLite)
 # Ensure sessions.db is in a writable location or adjust path
-SESSION_DB_URL = f"sqlite:///{os.path.join(AGENT_DIR, 'sessions.db')}"
+SESSION_DB_URL = "sqlite:///./sessions.db"
 # Example allowed origins for CORS
 ALLOWED_ORIGINS = ["*"] # Keeping this as per your setup
 # Set web=True if you intend to serve a web interface, False otherwise
