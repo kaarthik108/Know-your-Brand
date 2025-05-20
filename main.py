@@ -13,7 +13,7 @@ AGENT_DIR = os.path.dirname(os.path.abspath(__file__))
 # Ensure sessions.db is in a writable location or adjust path
 SESSION_DB_URL = f"sqlite:///{os.path.join(AGENT_DIR, 'sessions.db')}"
 # Example allowed origins for CORS
-ALLOWED_ORIGINS = ["http://localhost", "http://localhost:8080", "*"]
+ALLOWED_ORIGINS = ["*"]
 # Set web=True if you intend to serve a web interface, False otherwise
 SERVE_WEB_INTERFACE = True # Assuming you might want a web interface
 
