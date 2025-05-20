@@ -16,10 +16,7 @@ ENV/
 .env
 
 # Databases
-*.db
-*.sqlite
-*.sqlite3
-sessions.db
+# sessions.db
 
 # Logs and temporary files
 *.log
