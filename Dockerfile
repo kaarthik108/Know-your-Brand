@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.13-slim
 WORKDIR /app
 
 COPY requirements.txt .
@@ -13,7 +13,4 @@ USER myuser
 
 ENV PATH="/home/myuser/.local/bin:$PATH"
 
-ENV PORT=8080
-ENV HOST=0.0.0.0
-
-CMD uvicorn main:app --host ${HOST} --port ${PORT}
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port $PORT"]

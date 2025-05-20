@@ -2,10 +2,10 @@ import os
 import uvicorn
 from fastapi import FastAPI
 from google.adk.cli.fast_api import get_fast_api_app
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
+# load_dotenv()
 
 # Get the directory where main.py is located
 AGENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -13,7 +13,7 @@ AGENT_DIR = os.path.dirname(os.path.abspath(__file__))
 # Ensure sessions.db is in a writable location or adjust path
 SESSION_DB_URL = f"sqlite:///{os.path.join(AGENT_DIR, 'sessions.db')}"
 # Example allowed origins for CORS
-ALLOWED_ORIGINS = ["*"]
+ALLOWED_ORIGINS = ["*"] # Keeping this as per your setup
 # Set web=True if you intend to serve a web interface, False otherwise
 SERVE_WEB_INTERFACE = True # Assuming you might want a web interface
 
@@ -26,12 +26,8 @@ app: FastAPI = get_fast_api_app(
     web=SERVE_WEB_INTERFACE,
     # If your agent package is not directly named 'agent' or 'root_agent'
     # or if you have multiple agents, you might need to specify agent_name:
-    # agent_name="web_search_agent" # Specify if needed, ADK might auto-detect
+    # agent_name="web_search_agent" # ADK should auto-detect web_search_agent based on folder name
 )
-
-@app.get("/")
-async def custom_hello_route():
-    return {"message": "Hello working"}
 
 if __name__ == "__main__":
     # Use the PORT environment variable provided by Cloud Run, defaulting to 8080
