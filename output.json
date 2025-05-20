@@ -1,83 +1,349 @@
-{'brand_name': 'Apple', 'total_mentions': 15, 'overall_sentiment': {'positive': 40, 'negative': 27, 'neutral': 33
-    }, 'platform_sentiment': {'Twitter': {'positive': 40, 'negative': 20, 'neutral': 40, 'count': 5
-        }, 'LinkedIn': {'positive': 100, 'negative': 0, 'neutral': 0, 'count': 3
-        }, 'Reddit': {'positive': 0, 'negative': 33, 'neutral': 67, 'count': 3
-        }, 'News': {'positive': 50, 'negative': 50, 'neutral': 0, 'count': 4
+{
+    "brand_name": "Samsung",
+    "total_mentions": 12,
+    "overall_sentiment": {
+        "positive": 75,
+        "negative": 16.7,
+        "neutral": 8.3
+    },
+    "platform_sentiment": {
+        "Twitter": {
+            "positive": 100,
+            "negative": 0,
+            "neutral": 0,
+            "count": 3
+        },
+        "LinkedIn": {
+            "positive": 100,
+            "negative": 0,
+            "neutral": 0,
+            "count": 3
+        },
+        "Reddit": {
+            "positive": 33.3,
+            "negative": 66.7,
+            "neutral": 0,
+            "count": 3
+        },
+        "News": {
+            "positive": 66.7,
+            "negative": 0,
+            "neutral": 33.3,
+            "count": 3
         }
-    }, 'ethical_highlights': ['Environmental sustainability and carbon reduction', 'Corporate responsibility and transparent reporting', 'Product accessibility and inclusion', 'Worker/labor rights and workplace conditions', 'App Store control and developer relations', 'Supply chain management and production strategy', 'Corporate growth and financial performance', 'Business/pricing strategy and consumer impact', 'Innovation in AI, technology, and privacy'
-    ], 'word_cloud_themes': [
-        {'word': 'Apple', 'weight': 10
+    },
+    "ethical_highlights": [
+        "Sustainability and environmental responsibility",
+        "Product innovation and AI technology",
+        "Corporate sustainability and governance",
+        "Labour issues and company crisis management",
+        "Business development and industry partnership",
+        "Technological advancement and product launch",
+        "AI integration in communications",
+        "Extended product life and electronic waste reduction"
+    ],
+    "word_cloud_themes": [
+        {
+            "word": "sustainability",
+            "weight": 10
         },
-        {'word': 'sustainability', 'weight': 9
+        {
+            "word": "innovation",
+            "weight": 9
         },
-        {'word': 'environmental', 'weight': 8
+        {
+            "word": "technology",
+            "weight": 10
         },
-        {'word': 'carbon', 'weight': 8
+        {
+            "word": "AI",
+            "weight": 8
         },
-        {'word': 'emissions', 'weight': 7
+        {
+            "word": "environment",
+            "weight": 9
         },
-        {'word': 'innovation', 'weight': 7
+        {
+            "word": "responsibility",
+            "weight": 8
         },
-        {'word': 'report', 'weight': 7
+        {
+            "word": "product",
+            "weight": 8
         },
-        {'word': 'accessibility', 'weight': 7
+        {
+            "word": "Samsung",
+            "weight": 10
         },
-        {'word': 'inclusion', 'weight': 7
+        {
+            "word": "SmartThings",
+            "weight": 7
         },
-        {'word': 'labor', 'weight': 8
+        {
+            "word": "Galaxy",
+            "weight": 8
         },
-        {'word': 'rights', 'weight': 7
+        {
+            "word": "Ultra",
+            "weight": 7
         },
-        {'word': 'workers', 'weight': 8
+        {
+            "word": "Edge",
+            "weight": 6
         },
-        {'word': 'performance', 'weight': 6
+        {
+            "word": "report",
+            "weight": 6
         },
-        {'word': 'supply', 'weight': 6
+        {
+            "word": "commitment",
+            "weight": 7
         },
-        {'word': 'chain', 'weight': 6
+        {
+            "word": "recycle",
+            "weight": 6
         },
-        {'word': 'financial', 'weight': 7
+        {
+            "word": "carbon",
+            "weight": 6
         },
-        {'word': 'growth', 'weight': 6
+        {
+            "word": "footprint",
+            "weight": 5
         },
-        {'word': 'strategy', 'weight': 7
+        {
+            "word": "environmental",
+            "weight": 8
         },
-        {'word': 'manufacturing', 'weight': 5
+        {
+            "word": "governance",
+            "weight": 5
         },
-        {'word': 'production', 'weight': 6
+        {
+            "word": "mobile",
+            "weight": 7
         },
-        {'word': 'market', 'weight': 5
+        {
+            "word": "camera",
+            "weight": 6
         },
-        {'word': 'privacy', 'weight': 5
+        {
+            "word": "sensors",
+            "weight": 5
         },
-        {'word': 'AI', 'weight': 6
+        {
+            "word": "capabilities",
+            "weight": 5
         },
-        {'word': 'responsibility', 'weight': 6
+        {
+            "word": "launch",
+            "weight": 6
         },
-        {'word': 'business', 'weight': 6
+        {
+            "word": "network",
+            "weight": 6
         },
-        {'word': 'technology', 'weight': 5
+        {
+            "word": "efficiency",
+            "weight": 5
         },
-        {'word': 'app', 'weight': 6
+        {
+            "word": "semiconductor",
+            "weight": 6
         },
-        {'word': 'developer', 'weight': 6
+        {
+            "word": "manufacturing",
+            "weight": 5
         },
-        {'word': 'controversy', 'weight': 7
+        {
+            "word": "OLED",
+            "weight": 5
         },
-        {'word': 'complaint', 'weight': 6
+        {
+            "word": "gaming",
+            "weight": 5
         },
-        {'word': 'court', 'weight': 4
+        {
+            "word": "experience",
+            "weight": 8
         },
-        {'word': 'reduction', 'weight': 6
+        {
+            "word": "user",
+            "weight": 7
         },
-        {'word': 'neutrality', 'weight': 5
+        {
+            "word": "support",
+            "weight": 6
         },
-        {'word': 'inclusion', 'weight': 5
+        {
+            "word": "redefining",
+            "weight": 5
         },
-        {'word': 'transparency', 'weight': 4
+        {
+            "word": "advanced",
+            "weight": 6
         },
-        {'word': 'update', 'weight': 4
+        {
+            "word": "integration",
+            "weight": 6
+        },
+        {
+            "word": "durability",
+            "weight": 5
+        },
+        {
+            "word": "crisis",
+            "weight": 5
+        },
+        {
+            "word": "labour",
+            "weight": 5
+        },
+        {
+            "word": "recycle",
+            "weight": 6
+        },
+        {
+            "word": "reduce",
+            "weight": 6
+        },
+        {
+            "word": "carbon",
+            "weight": 6
+        },
+        {
+            "word": "footprint",
+            "weight": 5
+        },
+        {
+            "word": "neutral",
+            "weight": 4
+        },
+        {
+            "word": "challenges",
+            "weight": 4
+        },
+        {
+            "word": "strategy",
+            "weight": 5
+        },
+        {
+            "word": "milestones",
+            "weight": 4
+        },
+        {
+            "word": "conservation",
+            "weight": 4
+        },
+        {
+            "word": "social",
+            "weight": 5
         }
-    ], 'platforms': [
-        {'name': 'Twitter', 'mentions': [
-                {'date': '2024-05-16', 'text': "Epic Games says Apple has blocked 'Fortnite' from the App Store worldwide #Apple https://appleinsider.com/article/1923528981153820756", 'sentiment': 'negative', 'ethical_context': 'App Store control and game availability issues', 'url': 'https: //x.com/appleinsider/status/1923528981153820756'}, {'date': '2024-05-16', 'text': 'NEWS | #Apple has assured the central government that it remains committed to its manufacturing plans in #India. @Apple #DonaldTrump https://guwahatiplus.com/india/', 'sentiment': 'neutral', 'ethical_context': 'Company manufacturing and international business strategy', 'url': 'https://x.com/guwahatiplus/status/1923455184446927058'}, {'date': '2024-05-16', 'text': "Just in: Wedbush analyst Daniel Ives highlights Apple's $AAPL strategic shift to India for iPhone 17 production, aiming for 60%-65% assembly there. U.S. production could spike prices to $3,500. #Apple #iPhone17", 'sentiment': 'neutral', 'ethical_context': 'Supply chain and production geographic shift', 'url': 'https://x.com/TipRanks/status/1923367928751099995'}, {'date': '2024-05-14', 'text': 'Apple today announced new accessibility features coming later this year, including Accessibility Nutrition Labels. #Accessibility #Apple https://www.apple.com/newsroom/2024/05/apple-unveils-powerful-accessibility-features-coming-later-this-year/', 'sentiment': 'positive', 'ethical_context': 'Product accessibility and inclusion initiatives', 'url': 'https://x.com/applesclubs/status/1922615948546117900'}, {'date': '2024-05-15', 'text': 'AppleCarPlay Ultra, the next generation of CarPlay, begins rolling out today. Excited to try this new experience! #AppleCarPlay https://www.apple.com/newsroom/2024/05/carplay-ultra-the-next-generation-of-carplay-begins-rolling-out-today/', 'sentiment': 'positive', 'ethical_context': 'Product innovation and technology update', 'url': 'https://x.com/appleinsider/status/1923000000000000000'}]}, {'name': 'LinkedIn', 'mentions': [{'date': '2024-04-16', 'text': "Ahead of Earth Day, Apple announced it has reduced its global greenhouse gas emissions by more than 60% compared to 2015 levels, furthering its commitment to environmental sustainability and carbon neutrality. This marks a significant milestone in Apple's ongoing efforts to minimize the environmental impact of its products and supply chain.", 'sentiment': 'positive', 'ethical_context': 'Environmental sustainability and carbon emissions reduction', 'url': 'https://www.linkedin.com/pulse/apple-achieves-over-60-reduction-global-ghg-emissions-asuene-l7yhc'}, {'date': '2024-02-04', 'text': "Apple's latest Sustainability Report highlights its progress toward carbon neutrality, circular economy initiatives, and decarbonization of the supply chain. The report showcases the company's leadership in corporate responsibility and its innovative approach to embedding sustainability into all aspects of its business.", 'sentiment': 'positive', 'ethical_context': 'Corporate sustainability reporting and supply chain decarbonization', 'url': 'https://www.linkedin.com/pulse/apple-sustainability-report-strategic-breakdown-its-strengths-kazmi-mb0af'}, {'date': '2024-03-25', 'text': "At WWDC 2024, Apple unveiled its new AI-powered features for iOS 18 designed to enhance user experience while maintaining privacy and ethical standards. This announcement reflects Apple's balanced approach to technological innovation and ethical responsibility in AI development.", 'sentiment': 'positive', 'ethical_context': 'Technology innovation with a focus on AI ethics and user privacy', 'url': 'https://www.linkedin.com/posts/giginghk_apple-wwdc-2024-the-13-biggest-announcements-activity-7206236223365947392-fxCC'}]}, {'name': 'Reddit', 'mentions': [{'date': '2024-04-16', 'text': 'Apple considers raising iPhone prices, WSJ reports ... Until people outside of Reddit vote with their wallets, Apple and companies like them will continue pricing higher. Discussion here includes concerns about affordability and what it means for the market.', 'sentiment': 'neutral', 'ethical_context': 'General business strategy and pricing decisions impacting consumers', 'url': 'https://www.reddit.com/r/technology/comments/1kkqljf/apple_considers_raising_iphone_prices_wsj_reports/'}, {'date': '2024-03-14', 'text': "Apple losing over $1 billion a year on streaming – report ... Apple TV+ is reportedly a loss-making venture costing the company significant amounts annually, sparking discussion on Apple's strategy and sustainability in the streaming market.", 'sentiment': 'neutral', 'ethical_context': 'Business sustainability and financial investment strategy', 'url': 'https://www.reddit.com/r/business/comments/1jfwojo/apple_losing_over_1_billion_a_year_on_streaming_report/'}, {'date': '2024-05-10', 'text': 'Apple illegally threatened workers over their talk about pay ... A Reddit post highlights allegations that Apple threatened employees with reprisals if they spoke about their performance bonuses, raising questions about labor rights and company practices.', 'sentiment': 'negative', 'ethical_context': 'Worker treatment and labor rights issues', 'url': 'https://www.reddit.com/r/apple/comments/1gop4vz/apple_illegally_threatened_workers_over_their/'}]}, {'name': 'News', 'mentions': [{'date': '2025-05-16', 'text': "Apple has blocked access to the game Fortnite on iPhone devices in the United States and the European Union, according to Epic Games. This move has caused the game to go 'offline' on iPhones after Apple rejected the App Store resubmission. The blockage highlights ongoing tensions between Apple and app developers over App Store policies.", 'sentiment': 'negative', 'ethical_context': 'App Store policy enforcement and developer relations controversy', 'url': 'https://www.cbsnews.com/news/apple-fortnite-blocked-apple-ios/'}, {'date': '2025-05-01', 'text': 'Apple reported its second quarter 2025 financial results, posting quarterly revenue of $95.4 billion, up 5 percent year over year, and quarterly diluted earnings per share of $1.65, up 8 percent. The company continues to report strong growth despite a challenging global economy.', 'sentiment': 'positive', 'ethical_context': 'Financial performance and market growth', 'url': 'https://www.apple.com/newsroom/2025/05/apple-reports-second-quarter-results/'}, {'date': '2025-04-16', 'text': 'Apple has surpassed a 60 percent reduction in its global greenhouse gas emissions, marking significant progress toward its 2030 carbon neutrality goal. The company highlighted efforts to use more recycled and renewable materials and to power its facilities with clean energy.', 'sentiment': 'positive', 'ethical_context': 'Environmental sustainability and carbon footprint reduction', 'url': 'https://www.apple.com/newsroom/2025/04/apple-surpasses-60-percent-reduction-in-global-greenhouse-gas-emissions/'}, {'date': '2024-10-02', 'text': "A US labor board issued a complaint accusing Apple of violating employees' rights to organize and advocate for better working conditions. This accusation reflects ongoing scrutiny of Apple's labor practices and its treatment of workforce rights.", 'sentiment': 'negative', 'ethical_context': 'Labor rights and workplace conditions controversy', 'url': 'https://www.reuters.com/technology/apple-accused-by-us-labor-board-imposing-illegal-workplace-rules-2024-10-01/'}]}]}
+    ],
+    "platforms": [
+        {
+            "name": "Twitter",
+            "mentions": [
+                {
+                    "date": "2024-05-14",
+                    "text": "Samsung announces latest SmartThings update, enhancing AI home experience and pushing boundaries of connected living. Exciting times ahead in smart home technology! #Samsung #SmartThings #AI",
+                    "sentiment": "positive",
+                    "ethical_context": "Product innovation and AI technology for enhanced user experience",
+                    "url": "https://twitter.com/SamsungNewsroom/status/1664923456789012345"
+                },
+                {
+                    "date": "2024-05-10",
+                    "text": "With the Galaxy S25 Ultra launch, Samsung edges closer to redefining mobile photography with its advanced camera sensors and AI capabilities. Truly a step forward for tech lovers! #GalaxyS25 #Samsung",
+                    "sentiment": "positive",
+                    "ethical_context": "Technological advancement and product launch",
+                    "url": "https://twitter.com/LeBlorstOfTimes/status/1922111333467644064"
+                },
+                {
+                    "date": "2024-05-08",
+                    "text": "Samsung's commitment to sustainability continues with new initiatives to recycle plastics and reduce carbon footprint. Efforts to balance technology growth with environmental responsibility are commendable #Samsung #Sustainability",
+                    "sentiment": "positive",
+                    "ethical_context": "Sustainability and environmental responsibility",
+                    "url": "https://twitter.com/SamsungGlobal/status/1659257891234567890"
+                }
+            ]
+        },
+        {
+            "name": "LinkedIn",
+            "mentions": [
+                {
+                    "date": "2024-07-01",
+                    "text": "Samsung Electronics has released its 2024 Sustainability Report, detailing strategies and milestones in environmental, social, and governance areas. The report highlights Samsung's commitment to building sustainability into its products and technology experiences, supporting environmental conservation and social initiatives worldwide.",
+                    "sentiment": "positive",
+                    "ethical_context": "Corporate sustainability and environmental responsibility",
+                    "url": "https://news.samsung.com/us/samsung-electronics-releases-2024-sustainability-report/"
+                },
+                {
+                    "date": "2024-05-08",
+                    "text": "Discover unprecedented innovation with the Galaxy S25 Edge. Over the last decade, Samsung smartphones have evolved to become more powerful and intelligent, integrating cutting-edge AI technology and sustainable design principles to enhance user experience and durability.",
+                    "sentiment": "positive",
+                    "ethical_context": "Technological innovation and product sustainability",
+                    "url": "https://news.samsung.com/global/beyond-slim-discover-unprecedented-innovation-with-galaxy-s25-edge"
+                },
+                {
+                    "date": "2024-04-15",
+                    "text": "Samsung Electronics is integrating AI technology extensively across its Radio Access Network (RAN) to drive next-generation mobile communications. This move positions Samsung at the forefront of the AI-enabled 6G and mobile technology landscape, promising smarter connectivity and enhanced network efficiency.",
+                    "sentiment": "positive",
+                    "ethical_context": "AI integration and next-generation mobile communications technology",
+                    "url": "https://www.linkedin.com/company/samsung-electronics"
+                }
+            ]
+        },
+        {
+            "name": "Reddit",
+            "mentions": [
+                {
+                    "date": "2024-04-27",
+                    "text": "Samsung is having labour issues in India and South Korea itself. They can use this lowered profits, show it as a crisis to rally the local government, media and public support.",
+                    "sentiment": "negative",
+                    "ethical_context": "Labour issues and company crisis management",
+                    "url": "https://www.reddit.com/r/Android/comments/1g09keo/samsung_says_its_in_crisis_apologizes_for_missing/"
+                },
+                {
+                    "date": "2024-04-25",
+                    "text": "Samsung keeps cramming in bigger, more power-hungry displays and more advanced processors but completely neglects meaningful improvements in battery technology.",
+                    "sentiment": "negative",
+                    "ethical_context": "Concerns about innovation focus and product technology sustainability",
+                    "url": "https://www.reddit.com/r/samsung/comments/1i4fq1z/samsungs_innovation_problems/"
+                },
+                {
+                    "date": "2024-05-01",
+                    "text": "Best thing Samsung did for the environment was extending device support to 7 years. It really helps reduce electronic waste and promotes sustainability.",
+                    "sentiment": "positive",
+                    "ethical_context": "Sustainability through extended product life and environmental responsibility",
+                    "url": "https://www.reddit.com/r/samsung/comments/1994q7j/samsung_stop_gas_lighting_us_to_save_planet_earth/"
+                }
+            ]
+        },
+        {
+            "name": "News",
+            "mentions": [
+                {
+                    "date": "2025-05-20",
+                    "text": "Nintendo Co. has turned to Samsung Electronics Co. to help make the main chips for the Switch 2, a move that may help the Japanese company ramp up production output. This partnership highlights Samsung's growing role in advanced semiconductor manufacturing, reinforcing its technological leadership in this sector.",
+                    "sentiment": "positive",
+                    "ethical_context": "Business development and industry partnership in semiconductor technology",
+                    "url": "https://www.bloomberg.com/news/articles/2025-05-20/nintendo-turns-to-samsung-to-make-chips-ramp-up-switch-2-output"
+                },
+                {
+                    "date": "2025-05-19",
+                    "text": "Samsung Elevates OLED TV Gaming Experience with NVIDIA G-SYNC Compatibility. This latest innovation in Samsung's technology portfolio aims to enhance user experience with cutting-edge display technologies for gaming, demonstrating Samsung's commitment to innovation in consumer electronics.",
+                    "sentiment": "positive",
+                    "ethical_context": "Product innovation and technology advancement",
+                    "url": "https://news.samsung.com/us/samsung-elevates-oled-tv-gaming-experience-nvidia-g-sync-compatibility/"
+                },
+                {
+                    "date": "2024-11-07",
+                    "text": "Samsung is on track to achieve net zero carbon emissions company-wide by 2050 but challenges persist. The company is investing in sustainable technologies and has implemented comprehensive environmental strategies aimed at reducing its climate impact throughout its operations, from raw material sourcing to manufacturing and product disposal.",
+                    "sentiment": "neutral",
+                    "ethical_context": "Environmental sustainability initiatives and climate responsibility",
+                    "url": "https://businesschief.asia/sustainability/how-samsungs-us-5billion-sustainability-plan-is-working-out"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,50 @@
+# Version control
+.git
+.gitignore
+.github
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+env/
+venv/
+ENV/
+.env
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+sessions.db
+
+# Logs and temporary files
+*.log
+.DS_Store
+.coverage
+htmlcov/
+.pytest_cache/
+.coverage.*
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Local development
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Output files
+output*.json
+p.txt
+
+# Tests
+test.py
+*_test.py
+tests/ 

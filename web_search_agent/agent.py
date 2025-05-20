@@ -219,7 +219,7 @@ linkedin_loop_agent = LoopAgent(
 )
 
 reddit_agent = LlmAgent(
-    model=model_mini,
+    model=model_groq,
     name='reddit_search_agent',
     description="Searches Reddit for recent brand mentions",
     instruction="""
