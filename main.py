@@ -1,13 +1,12 @@
 import os
 import uvicorn
-import asyncio
 import json
 import logging
-from typing import Any, Dict, Optional
-import threading
+import asyncio
+from typing import Any, Dict
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from google.adk.runners import Runner
@@ -16,7 +15,6 @@ from google.genai import types
 
 from mcp_brand_agent.agent import root_agent
 from database import db_manager
-
 # Load environment variables
 load_dotenv('.env')
 
@@ -37,17 +35,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Initialize database tables on startup
-@app.on_event("startup")
-async def startup_event():
-    try:
-        db_manager.init_tables()
-        logger.info("Database initialized successfully")
-    except Exception as e:
-        logger.error(f"Failed to initialize database: {e}")
-        raise
-
 
 def init_session_service() -> DatabaseSessionService:
     try:
@@ -72,73 +59,6 @@ except Exception as e:
     session_service = None
 
 # session_service = InMemorySessionService()
-
-
-def run_agent_logic_background_sync(
-    user_id: str, session_id: str, question: str, brand_name: str
-):
-    """
-    Synchronous wrapper for background task to avoid async issues
-    """
-    try:
-        # Update status to running
-        db_manager.update_status(user_id, session_id, "running")
-        logger.info(f"Started analysis for user {user_id}, session {session_id}, brand {brand_name}")
-        
-        # Create a new event loop for this thread
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        
-        try:
-            # Run the actual agent logic
-            result = loop.run_until_complete(run_agent_logic(user_id, session_id, question))
-            
-            # Get updated session after agent execution
-            updated_session = loop.run_until_complete(session_service.get_session(
-                app_name=APP_NAME,
-                user_id=user_id,
-                session_id=session_id,
-            ))
-            
-            analysis_results_twitter = updated_session.state.get("final_twitter_results", {})
-            analysis_results_linkedin = updated_session.state.get("final_linkedin_results", {})
-            analysis_results_reddit = updated_session.state.get("final_reddit_results", {})
-            analysis_results_news = updated_session.state.get("final_news_results", {})
-            
-            # Parse JSON strings if needed
-            def parse_result(result_data):
-                if isinstance(result_data, str):
-                    try:
-                        return json.loads(result_data)
-                    except json.JSONDecodeError:
-                        return {"raw_data": result_data}
-                return result_data if result_data else {}
-            
-            analysis_results_twitter = parse_result(analysis_results_twitter)
-            analysis_results_linkedin = parse_result(analysis_results_linkedin)
-            analysis_results_reddit = parse_result(analysis_results_reddit)
-            analysis_results_news = parse_result(analysis_results_news)
-
-            response_data = {
-                "userId": user_id,
-                "sessionId": session_id,
-                "brand_name": brand_name,
-                "analysis_results_twitter": analysis_results_twitter,
-                "analysis_results_linkedin": analysis_results_linkedin,
-                "analysis_results_reddit": analysis_results_reddit,
-                "analysis_results_news": analysis_results_news
-            }
-            
-            # Save results to database
-            db_manager.save_results(user_id, session_id, response_data)
-            logger.info(f"Analysis completed successfully for user {user_id}, session {session_id}")
-            
-        finally:
-            loop.close()
-        
-    except Exception as e:
-        logger.error(f"Error in background analysis for user {user_id}, session {session_id}: {e}")
-        db_manager.update_status(user_id, session_id, "failed", str(e))
 
 
 async def run_agent_logic(
@@ -249,52 +169,98 @@ class QueryRequest(BaseModel):
     userId: str
     sessionId: str
     question: str
-    brand_name: str = None
+
+
+async def process_brand_analysis_background(user_id: str, session_id: str, question: str):
+    """
+    Background task to process brand analysis
+    """
+    try:
+        # Update status to processing
+        db_manager.update_status(user_id, session_id, "processing")
+        
+        # Get or create session
+        await get_or_create_session(user_id, session_id)
+
+        # Run the agent logic
+        await run_agent_logic(user_id, session_id, question)
+
+        # Get updated session after agent execution
+        updated_session = await session_service.get_session(
+            app_name=APP_NAME,
+            user_id=user_id,
+            session_id=session_id,
+        )
+
+        analysis_results_twitter = updated_session.state.get("final_twitter_results", {})
+        analysis_results_linkedin = updated_session.state.get("final_linkedin_results", {})
+        analysis_results_reddit = updated_session.state.get("final_reddit_results", {})
+        analysis_results_news = updated_session.state.get("final_news_results", {})
+
+        # Parse JSON strings if needed
+        def parse_result(result_data):
+            if isinstance(result_data, str):
+                try:
+                    return json.loads(result_data)
+                except json.JSONDecodeError:
+                    return {"raw_data": result_data}
+            return result_data if result_data else {}
+
+        analysis_results_twitter = parse_result(analysis_results_twitter)
+        analysis_results_linkedin = parse_result(analysis_results_linkedin)
+        analysis_results_reddit = parse_result(analysis_results_reddit)
+        analysis_results_news = parse_result(analysis_results_news)
+
+        response_data = {
+            "userId": user_id,
+            "sessionId": session_id,
+            "brand_name": question.split()[0] if question else "Unknown",
+            "analysis_results_twitter": analysis_results_twitter,
+            "analysis_results_linkedin": analysis_results_linkedin,
+            "analysis_results_reddit": analysis_results_reddit,
+            "analysis_results_news": analysis_results_news
+        }
+
+        # Save results and mark as completed
+        db_manager.save_results(user_id, session_id, response_data)
+        
+        logger.info(f"Background processing completed for user {user_id}, session {session_id}")
+
+    except Exception as e:
+        logger.error(f"Background processing failed for user {user_id}, session {session_id}: {e}")
+        db_manager.update_status(user_id, session_id, "failed", str(e))
 
 
 @app.post("/query")
-async def query_endpoint(request_data: QueryRequest):
+async def query_endpoint(request_data: QueryRequest, background_tasks: BackgroundTasks):
     try:
-        # Extract brand name from question if not provided
-        brand_name = request_data.brand_name or request_data.question.split()[0] if request_data.question else "Unknown"
-        
         # Create database entry and get request ID
         request_id = db_manager.create_request(
             request_data.userId, 
             request_data.sessionId, 
-            brand_name
+            request_data.question
         )
         
-        # Get or create session
-        await get_or_create_session(
+        # Add background task to process the analysis
+        background_tasks.add_task(
+            process_brand_analysis_background,
             request_data.userId,
-            request_data.sessionId
+            request_data.sessionId,
+            request_data.question
         )
         
-        # Start background task for analysis using threading
-        thread = threading.Thread(
-            target=run_agent_logic_background_sync,
-            args=(
-                request_data.userId,
-                request_data.sessionId,
-                request_data.question,
-                brand_name
-            ),
-            daemon=True
-        )
-        thread.start()
-        
-        # Return immediate response with request ID and status
+        # Return immediately with request details
         return {
-            "request_id": request_id,
+            "message": "Brand analysis request received and is being processed",
             "userId": request_data.userId,
             "sessionId": request_data.sessionId,
-            "brand_name": brand_name,
-            "status": "running",
-            "message": "Analysis started. Use the status endpoint to check progress."
+            "requestId": request_id,
+            "status": "processing",
+            "statusEndpoint": f"/status/{request_data.userId}/{request_data.sessionId}"
         }
 
     except ValueError as e:
+        logger.error(f"Validation error in query_endpoint: {e}")
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         logger.error(f"Unhandled exception in query_endpoint: {e}")
@@ -304,7 +270,7 @@ async def query_endpoint(request_data: QueryRequest):
 @app.get("/status/{user_id}/{session_id}")
 async def get_status(user_id: str, session_id: str):
     """
-    Get the current status of a brand analysis request
+    Get the status of a brand analysis request
     """
     try:
         status_data = db_manager.get_request_status(user_id, session_id)
@@ -313,19 +279,19 @@ async def get_status(user_id: str, session_id: str):
             raise HTTPException(status_code=404, detail="Request not found")
         
         response = {
-            "request_id": status_data["id"],
             "userId": user_id,
             "sessionId": session_id,
-            "brand_name": status_data["brand_name"],
             "status": status_data["status"],
-            "created_at": status_data["created_at"].isoformat() if status_data["created_at"] else None,
-            "updated_at": status_data["updated_at"].isoformat() if status_data["updated_at"] else None,
+            "createdAt": status_data["created_at"],
+            "updatedAt": status_data["updated_at"]
         }
         
-        if status_data["status"] == "failed" and status_data["error_message"]:
-            response["error_message"] = status_data["error_message"]
+        # Include error message if failed
+        if status_data["status"] == "failed" and status_data.get("error_message"):
+            response["errorMessage"] = status_data["error_message"]
         
-        if status_data["status"] == "completed" and status_data["results"]:
+        # Include results if completed
+        if status_data["status"] == "completed" and status_data.get("results"):
             response["results"] = status_data["results"]
         
         return response
@@ -333,23 +299,7 @@ async def get_status(user_id: str, session_id: str):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error getting status for user {user_id}, session {session_id}: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
-
-
-@app.delete("/cleanup")
-async def cleanup_old_requests(days: int = 7):
-    """
-    Clean up old completed/failed requests (admin endpoint)
-    """
-    try:
-        deleted_count = db_manager.cleanup_old_requests(days)
-        return {
-            "message": f"Cleaned up {deleted_count} old requests",
-            "deleted_count": deleted_count
-        }
-    except Exception as e:
-        logger.error(f"Error during cleanup: {e}")
+        logger.error(f"Error getting status for {user_id}/{session_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
