@@ -199,11 +199,6 @@ Search multiple news sources if needed. No empty results - find real articles fr
 #     max_iterations=2
 # )
 # Create platform search sequential agent
-platform_search_agent = ParallelAgent(
-    name="platform_search",
-    description="""Runs multiple search agents in parallel to find brand mentions on multiple platforms.""",
-    sub_agents=[twitter_agent, linkedin_agent, reddit_agent, news_agent],
-)
 
 # Create platform-specific analysis agents
 twitter_analysis_agent = LlmAgent(
@@ -434,22 +429,39 @@ Make sure your response is valid JSON that can be parsed.
     output_key="analysis_results_news"
 )
 
-parallel_analysis_coordinator_agent = ParallelAgent(
-    name="parallel_analysis_coordinator",
+
+twitter_sequential_agent = SequentialAgent(
+    name="twitter_sequential_agent",
+    description="Runs the twitter_search_agent and twitter_analysis_agent sequentially",
+    sub_agents=[twitter_agent, twitter_analysis_agent]
+)
+
+linkedin_sequential_agent = SequentialAgent(
+    name="linkedin_sequential_agent",
+    description="Runs the linkedin_search_agent and linkedin_analysis_agent sequentially",
+    sub_agents=[linkedin_agent, linkedin_analysis_agent]
+)
+
+reddit_sequential_agent = SequentialAgent(
+    name="reddit_sequential_agent",
+    description="Runs the reddit_search_agent and reddit_analysis_agent sequentially",
+    sub_agents=[reddit_agent, reddit_analysis_agent]
+)
+
+news_sequential_agent = SequentialAgent(
+    name="news_sequential_agent",
+    description="Runs the news_search_agent and news_analysis_agent sequentially",
+    sub_agents=[news_agent, news_analysis_agent]
+)
+
+
+root_agent = ParallelAgent(
+    name="root_agent",
     description="Coordinates parallel analysis of brand mentions for each platform.",
     sub_agents=[
-        twitter_analysis_agent,
-        linkedin_analysis_agent,
-        reddit_analysis_agent,
-        news_analysis_agent
+        twitter_sequential_agent,
+        linkedin_sequential_agent,
+        reddit_sequential_agent,
+        news_sequential_agent
     ]
 )
-
-# Create main sequential agent
-main_agent = SequentialAgent(
-    name="mcp_brand_agent",
-    description="You are a brand monitoring agent. Your task is to monitor the brand mentions across multiple platforms and provide a comprehensive summary of the mentions",
-    sub_agents=[platform_search_agent, parallel_analysis_coordinator_agent]
-)
-
-root_agent = main_agent

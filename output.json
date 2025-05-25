@@ -1,349 +1,343 @@
 {
-    "brand_name": "Samsung",
-    "total_mentions": 12,
-    "overall_sentiment": {
-        "positive": 75,
-        "negative": 16.7,
-        "neutral": 8.3
-    },
-    "platform_sentiment": {
-        "Twitter": {
-            "positive": 100,
-            "negative": 0,
-            "neutral": 0,
-            "count": 3
-        },
-        "LinkedIn": {
-            "positive": 100,
-            "negative": 0,
-            "neutral": 0,
-            "count": 3
-        },
-        "Reddit": {
-            "positive": 33.3,
-            "negative": 66.7,
-            "neutral": 0,
-            "count": 3
-        },
-        "News": {
-            "positive": 66.7,
-            "negative": 0,
-            "neutral": 33.3,
-            "count": 3
-        }
-    },
-    "ethical_highlights": [
-        "Sustainability and environmental responsibility",
-        "Product innovation and AI technology",
-        "Corporate sustainability and governance",
-        "Labour issues and company crisis management",
-        "Business development and industry partnership",
-        "Technological advancement and product launch",
-        "AI integration in communications",
-        "Extended product life and electronic waste reduction"
-    ],
-    "word_cloud_themes": [
-        {
-            "word": "sustainability",
-            "weight": 10
-        },
-        {
-            "word": "innovation",
-            "weight": 9
-        },
-        {
-            "word": "technology",
-            "weight": 10
-        },
-        {
-            "word": "AI",
-            "weight": 8
-        },
-        {
-            "word": "environment",
-            "weight": 9
-        },
-        {
-            "word": "responsibility",
-            "weight": 8
-        },
-        {
-            "word": "product",
-            "weight": 8
-        },
-        {
-            "word": "Samsung",
-            "weight": 10
-        },
-        {
-            "word": "SmartThings",
-            "weight": 7
-        },
-        {
-            "word": "Galaxy",
-            "weight": 8
-        },
-        {
-            "word": "Ultra",
-            "weight": 7
-        },
-        {
-            "word": "Edge",
-            "weight": 6
-        },
-        {
-            "word": "report",
-            "weight": 6
-        },
-        {
-            "word": "commitment",
-            "weight": 7
-        },
-        {
-            "word": "recycle",
-            "weight": 6
-        },
-        {
-            "word": "carbon",
-            "weight": 6
-        },
-        {
-            "word": "footprint",
-            "weight": 5
-        },
-        {
-            "word": "environmental",
-            "weight": 8
-        },
-        {
-            "word": "governance",
-            "weight": 5
-        },
-        {
-            "word": "mobile",
-            "weight": 7
-        },
-        {
-            "word": "camera",
-            "weight": 6
-        },
-        {
-            "word": "sensors",
-            "weight": 5
-        },
-        {
-            "word": "capabilities",
-            "weight": 5
-        },
-        {
-            "word": "launch",
-            "weight": 6
-        },
-        {
-            "word": "network",
-            "weight": 6
-        },
-        {
-            "word": "efficiency",
-            "weight": 5
-        },
-        {
-            "word": "semiconductor",
-            "weight": 6
-        },
-        {
-            "word": "manufacturing",
-            "weight": 5
-        },
-        {
-            "word": "OLED",
-            "weight": 5
-        },
-        {
-            "word": "gaming",
-            "weight": 5
-        },
-        {
-            "word": "experience",
-            "weight": 8
-        },
-        {
-            "word": "user",
-            "weight": 7
-        },
-        {
-            "word": "support",
-            "weight": 6
-        },
-        {
-            "word": "redefining",
-            "weight": 5
-        },
-        {
-            "word": "advanced",
-            "weight": 6
-        },
-        {
-            "word": "integration",
-            "weight": 6
-        },
-        {
-            "word": "durability",
-            "weight": 5
-        },
-        {
-            "word": "crisis",
-            "weight": 5
-        },
-        {
-            "word": "labour",
-            "weight": 5
-        },
-        {
-            "word": "recycle",
-            "weight": 6
-        },
-        {
-            "word": "reduce",
-            "weight": 6
-        },
-        {
-            "word": "carbon",
-            "weight": 6
-        },
-        {
-            "word": "footprint",
-            "weight": 5
-        },
-        {
-            "word": "neutral",
-            "weight": 4
-        },
-        {
-            "word": "challenges",
-            "weight": 4
-        },
-        {
-            "word": "strategy",
-            "weight": 5
-        },
-        {
-            "word": "milestones",
-            "weight": 4
-        },
-        {
-            "word": "conservation",
-            "weight": 4
-        },
-        {
-            "word": "social",
-            "weight": 5
-        }
-    ],
-    "platforms": [
-        {
-            "name": "Twitter",
-            "mentions": [
-                {
-                    "date": "2024-05-14",
-                    "text": "Samsung announces latest SmartThings update, enhancing AI home experience and pushing boundaries of connected living. Exciting times ahead in smart home technology! #Samsung #SmartThings #AI",
-                    "sentiment": "positive",
-                    "ethical_context": "Product innovation and AI technology for enhanced user experience",
-                    "url": "https://twitter.com/SamsungNewsroom/status/1664923456789012345"
-                },
-                {
-                    "date": "2024-05-10",
-                    "text": "With the Galaxy S25 Ultra launch, Samsung edges closer to redefining mobile photography with its advanced camera sensors and AI capabilities. Truly a step forward for tech lovers! #GalaxyS25 #Samsung",
-                    "sentiment": "positive",
-                    "ethical_context": "Technological advancement and product launch",
-                    "url": "https://twitter.com/LeBlorstOfTimes/status/1922111333467644064"
-                },
-                {
-                    "date": "2024-05-08",
-                    "text": "Samsung's commitment to sustainability continues with new initiatives to recycle plastics and reduce carbon footprint. Efforts to balance technology growth with environmental responsibility are commendable #Samsung #Sustainability",
-                    "sentiment": "positive",
-                    "ethical_context": "Sustainability and environmental responsibility",
-                    "url": "https://twitter.com/SamsungGlobal/status/1659257891234567890"
-                }
-            ]
-        },
-        {
-            "name": "LinkedIn",
-            "mentions": [
-                {
-                    "date": "2024-07-01",
-                    "text": "Samsung Electronics has released its 2024 Sustainability Report, detailing strategies and milestones in environmental, social, and governance areas. The report highlights Samsung's commitment to building sustainability into its products and technology experiences, supporting environmental conservation and social initiatives worldwide.",
-                    "sentiment": "positive",
-                    "ethical_context": "Corporate sustainability and environmental responsibility",
-                    "url": "https://news.samsung.com/us/samsung-electronics-releases-2024-sustainability-report/"
-                },
-                {
-                    "date": "2024-05-08",
-                    "text": "Discover unprecedented innovation with the Galaxy S25 Edge. Over the last decade, Samsung smartphones have evolved to become more powerful and intelligent, integrating cutting-edge AI technology and sustainable design principles to enhance user experience and durability.",
-                    "sentiment": "positive",
-                    "ethical_context": "Technological innovation and product sustainability",
-                    "url": "https://news.samsung.com/global/beyond-slim-discover-unprecedented-innovation-with-galaxy-s25-edge"
-                },
-                {
-                    "date": "2024-04-15",
-                    "text": "Samsung Electronics is integrating AI technology extensively across its Radio Access Network (RAN) to drive next-generation mobile communications. This move positions Samsung at the forefront of the AI-enabled 6G and mobile technology landscape, promising smarter connectivity and enhanced network efficiency.",
-                    "sentiment": "positive",
-                    "ethical_context": "AI integration and next-generation mobile communications technology",
-                    "url": "https://www.linkedin.com/company/samsung-electronics"
-                }
-            ]
-        },
-        {
-            "name": "Reddit",
-            "mentions": [
-                {
-                    "date": "2024-04-27",
-                    "text": "Samsung is having labour issues in India and South Korea itself. They can use this lowered profits, show it as a crisis to rally the local government, media and public support.",
-                    "sentiment": "negative",
-                    "ethical_context": "Labour issues and company crisis management",
-                    "url": "https://www.reddit.com/r/Android/comments/1g09keo/samsung_says_its_in_crisis_apologizes_for_missing/"
-                },
-                {
-                    "date": "2024-04-25",
-                    "text": "Samsung keeps cramming in bigger, more power-hungry displays and more advanced processors but completely neglects meaningful improvements in battery technology.",
-                    "sentiment": "negative",
-                    "ethical_context": "Concerns about innovation focus and product technology sustainability",
-                    "url": "https://www.reddit.com/r/samsung/comments/1i4fq1z/samsungs_innovation_problems/"
-                },
-                {
-                    "date": "2024-05-01",
-                    "text": "Best thing Samsung did for the environment was extending device support to 7 years. It really helps reduce electronic waste and promotes sustainability.",
-                    "sentiment": "positive",
-                    "ethical_context": "Sustainability through extended product life and environmental responsibility",
-                    "url": "https://www.reddit.com/r/samsung/comments/1994q7j/samsung_stop_gas_lighting_us_to_save_planet_earth/"
-                }
-            ]
-        },
-        {
-            "name": "News",
-            "mentions": [
-                {
-                    "date": "2025-05-20",
-                    "text": "Nintendo Co. has turned to Samsung Electronics Co. to help make the main chips for the Switch 2, a move that may help the Japanese company ramp up production output. This partnership highlights Samsung's growing role in advanced semiconductor manufacturing, reinforcing its technological leadership in this sector.",
-                    "sentiment": "positive",
-                    "ethical_context": "Business development and industry partnership in semiconductor technology",
-                    "url": "https://www.bloomberg.com/news/articles/2025-05-20/nintendo-turns-to-samsung-to-make-chips-ramp-up-switch-2-output"
-                },
-                {
-                    "date": "2025-05-19",
-                    "text": "Samsung Elevates OLED TV Gaming Experience with NVIDIA G-SYNC Compatibility. This latest innovation in Samsung's technology portfolio aims to enhance user experience with cutting-edge display technologies for gaming, demonstrating Samsung's commitment to innovation in consumer electronics.",
-                    "sentiment": "positive",
-                    "ethical_context": "Product innovation and technology advancement",
-                    "url": "https://news.samsung.com/us/samsung-elevates-oled-tv-gaming-experience-nvidia-g-sync-compatibility/"
-                },
-                {
-                    "date": "2024-11-07",
-                    "text": "Samsung is on track to achieve net zero carbon emissions company-wide by 2050 but challenges persist. The company is investing in sustainable technologies and has implemented comprehensive environmental strategies aimed at reducing its climate impact throughout its operations, from raw material sourcing to manufacturing and product disposal.",
-                    "sentiment": "neutral",
-                    "ethical_context": "Environmental sustainability initiatives and climate responsibility",
-                    "url": "https://businesschief.asia/sustainability/how-samsungs-us-5billion-sustainability-plan-is-working-out"
-                }
-            ]
-        }
-    ]
+	"userId": "user2",
+	"sessionId": "test-session-11",
+	"analysis_results_twitter": {
+		"brand_name": "Tesla",
+		"platform_name": "Twitter",
+		"total_mentions_on_platform": 3,
+		"platform_sentiment_breakdown": {
+			"positive": 0.6667,
+			"negative": 0,
+			"neutral": 0.3333
+		},
+		"ethical_highlights_on_platform": [
+			"Regulatory impact on technology innovation and safety concerns around autonomous vehicles.",
+			"Public expectations and media scrutiny of autonomous technology launches.",
+			"Federal support for innovation and regulatory harmonization in self-driving technology."
+		],
+		"word_cloud_themes_on_platform": [
+			{
+				"word": "autonomous",
+				"weight": 8
+			},
+			{
+				"word": "vehicles",
+				"weight": 8
+			},
+			{
+				"word": "regulatory",
+				"weight": 7
+			},
+			{
+				"word": "technology",
+				"weight": 8
+			},
+			{
+				"word": "innovation",
+				"weight": 6
+			},
+			{
+				"word": "safety",
+				"weight": 5
+			},
+			{
+				"word": "Tesla",
+				"weight": 10
+			},
+			{
+				"word": "robotaxi",
+				"weight": 6
+			},
+			{
+				"word": "approval",
+				"weight": 4
+			},
+			{
+				"word": "launch",
+				"weight": 4
+			},
+			{
+				"word": "nation-wide",
+				"weight": 4
+			},
+			{
+				"word": "support",
+				"weight": 3
+			},
+			{
+				"word": "automakers",
+				"weight": 3
+			}
+		],
+		"mentions_on_platform": [
+			{
+				"date": "2025-04-25",
+				"text": "The Trump administration is loosening regulations to support U.S. automakers like Tesla in developing self-driving cars. The United States ...",
+				"sentiment": "positive",
+				"ethical_context": "Regulatory impact on technology innovation and safety concerns around autonomous vehicles.",
+				"url": "https://x.com/Teslarati/status/1915729844157235232"
+			},
+			{
+				"date": "2025-05-19",
+				"text": "Tesla Robotaxi is among the biggest tech developments of the year, and its June launch date has not yet arrived. This does not matter to ...",
+				"sentiment": "neutral",
+				"ethical_context": "Public expectations and media scrutiny of autonomous technology launches.",
+				"url": "https://x.com/Teslarati/status/1924553082924417438"
+			},
+			{
+				"date": "2025-04-24",
+				"text": "The second win for Tesla is the announcement that the US will move to a nation-wide approval process for Autonomous Vehicles. Tesla has been ...",
+				"sentiment": "positive",
+				"ethical_context": "Federal support for innovation and regulatory harmonization in self-driving technology.",
+				"url": "https://x.com/techAU/status/1915531534242910386"
+			}
+		]
+	},
+	"analysis_results_linkedin": {
+		"brand_name": "Tesla",
+		"platform_name": "LinkedIn",
+		"total_mentions_on_platform": 3,
+		"platform_sentiment_breakdown": {
+			"positive": 1,
+			"negative": 0,
+			"neutral": 0
+		},
+		"ethical_highlights_on_platform": [
+			"Sustainability and innovation in clean energy technology",
+			"AI safety and responsible technology deployment"
+		],
+		"word_cloud_themes_on_platform": [
+			{
+				"word": "innovation",
+				"weight": 10
+			},
+			{
+				"word": "battery",
+				"weight": 8
+			},
+			{
+				"word": "AI",
+				"weight": 7
+			},
+			{
+				"word": "technology",
+				"weight": 7
+			},
+			{
+				"word": "production",
+				"weight": 6
+			},
+			{
+				"word": "vehicle",
+				"weight": 7
+			},
+			{
+				"word": "autonomous",
+				"weight": 5
+			},
+			{
+				"word": "energy",
+				"weight": 6
+			},
+			{
+				"word": "strategy",
+				"weight": 5
+			},
+			{
+				"word": "sustainability",
+				"weight": 6
+			}
+		],
+		"mentions_on_platform": [
+			{
+				"date": "2025-05-06",
+				"text": "Recent reports from international news outlets indicate that Tesla is significantly accelerating its most ambitious battery initiative in its 21-year history. Sources familiar with the matter suggest the electric vehicle pioneer aims to introduce four entirely new versions of its 4680 battery cell in the year 2026. These advanced power units are reportedly slated to power a range of upcoming Tesla vehicles, including the highly anticipated electric truck Cybertruck and the fully autonomous ride-hailing vehicle Robotaxi, as well as other electric car models. This endeavor represents Tesla's largest simultaneous battery development project to date. ... Timeline: Tesla plans to achieve mass production of these new batteries by the second quarter of 2025, with the full launch of all four cell types slated for 2026.",
+				"sentiment": "positive",
+				"ethical_context": "Sustainability, innovation in clean energy technology, corporate transparency",
+				"url": "https://www.linkedin.com/pulse/tesla-intensifies-efforts-groundbreaking-battery-project-singal-2jr3c"
+			},
+			{
+				"date": "2023-04-19",
+				"text": "Artificial Intelligence (AI) is increasingly being utilized in the automotive industry to enhance safety, convenience, and efficiency. One of the pioneers of this trend is Tesla, the electric vehicle company founded by Elon Musk. Tesla has been integrating AI into its cars since its inception and has developed some of the most advanced AI-powered features in the automotive market. The importance of AI in the automotive industry cannot be overstated. With the increasing demand for electric and autonomous vehicles, AI is becoming a key enabler of these technologies. AI-powered features, such as Tesla's Autopilot, have the potential to reduce accidents, enhance the driving experience, and improve energy efficiency.",
+				"sentiment": "positive",
+				"ethical_context": "AI safety, automotive ethics, consumer benefit, responsible technology deployment",
+				"url": "https://www.linkedin.com/pulse/teslas-use-ai-revolutionary-approach-car-technology-alexander-stahl"
+			},
+			{
+				"date": "2024-01-01",
+				"text": "This article analyzes the innovation process in Tesla Inc.'s business strategy. Tesla manages its mainstream and newstream innovation process effectively. In addition, the company sought to establish several strategic partnerships to accelerate its technological advancement process. ... Tesla's speed of innovation in the high-end vehicle market makes it more like a Google or an Amazon than an automaker. And its growing market valuation is a clear signal to all car manufacturers that they must develop more innovative business models like Tesla to survive. ... Tesla provides customers with free charging stations, known as Superchargers, throughout the United States and Europe. The company's strategy of building colossal factories, called Gigafactories, has allowed them to increase battery and vehicle production.",
+				"sentiment": "positive",
+				"ethical_context": "Corporate innovation, competitive dynamics, strategic partnerships, sustainable development",
+				"url": "https://www.linkedin.com/pulse/innovation-process-tesla-inc-sandro-saboia-11ybf"
+			}
+		]
+	},
+	"analysis_results_reddit": {
+		"brand_name": "Tesla",
+		"platform_name": "Reddit",
+		"total_mentions_on_platform": 3,
+		"platform_sentiment_breakdown": {
+			"positive": 0,
+			"negative": 1,
+			"neutral": 0
+		},
+		"ethical_highlights_on_platform": [
+			"Consumer trust and safety concerns",
+			"Impact of leadership/politics on brand perception",
+			"Product quality and technological innovation compared to competitors",
+			"Perceived stagnation in technology"
+		],
+		"word_cloud_themes_on_platform": [
+			{
+				"word": "Tesla",
+				"weight": 10
+			},
+			{
+				"word": "Tech",
+				"weight": 10
+			},
+			{
+				"word": "Technology",
+				"weight": 9
+			},
+			{
+				"word": "Elon",
+				"weight": 8
+			},
+			{
+				"word": "Americans",
+				"weight": 7
+			},
+			{
+				"word": "Safety",
+				"weight": 8
+			},
+			{
+				"word": "Quality",
+				"weight": 8
+			},
+			{
+				"word": "Politics",
+				"weight": 7
+			},
+			{
+				"word": "Advantage",
+				"weight": 6
+			},
+			{
+				"word": "Bad",
+				"weight": 7
+			},
+			{
+				"word": "Consumers",
+				"weight": 6
+			},
+			{
+				"word": "Rivals",
+				"weight": 6
+			}
+		],
+		"mentions_on_platform": [
+			{
+				"date": "Recent",
+				"text": "25% of Americans Avoiding Tesla Tech Because of Elon. Americans are avoiding Tesla technology for safety and quality control reasons. Musk's politics may also be alienating some consumers.",
+				"sentiment": "negative",
+				"ethical_context": "Consumer trust, safety, and the impact of leadership on brand perception.",
+				"url": "https://www.reddit.com/r/RealTesla/comments/1hyn3o1/25%5Fof%5Famericans%5Favoiding%5Ftesla%5Ftech%5Fbecause%5Fof/"
+			},
+			{
+				"date": "2 years ago",
+				"text": "Where does Tesla's tech advantage sit these days? It seems that Teslas actually have pretty bad tech for a modern car. No sensors, no 360 camera, no CarPlay/AA (debatable, I prefer Teslas UI...",
+				"sentiment": "negative",
+				"ethical_context": "Product quality and technological innovation compared to competitors.",
+				"url": "https://www.reddit.com/r/TeslaModelY/comments/1399rh9/where%5Fdoes%5Fteslas%5Ftech%5Fadvantage%5Fsit%5Fthese%5Fdays/"
+			},
+			{
+				"date": "Recent",
+				"text": "Sorry Elon, most Americans are uneasy with this Tesla... The only good tech in Teslas are the battery packs and the engines, and those are thanks to the original founders. Rivals have caught up on both...",
+				"sentiment": "negative",
+				"ethical_context": "Technological innovation, market competition, and perceived stagnation.",
+				"url": "https://www.reddit.com/r/RealTesla/comments/1j5mzyh/sorry%5Felon%5Fmost%5Famericans%5Fare%5Funeasy%5Fwith%5Fthis/"
+			}
+		]
+	},
+	"analysis_results_news": {
+		"brand_name": "Tesla",
+		"platform_name": "News",
+		"total_mentions_on_platform": 3,
+		"platform_sentiment_breakdown": {
+			"positive": 0.6667,
+			"negative": 0.3333,
+			"neutral": 0
+		},
+		"ethical_highlights_on_platform": [
+			"Innovation ethics, responsible investing, and the societal impact of autonomous technology rollouts.",
+			"Data privacy and regulatory compliance relating to artificial intelligence applications."
+		],
+		"word_cloud_themes_on_platform": [
+			{
+				"word": "robotaxis",
+				"weight": 8
+			},
+			{
+				"word": "autonomous",
+				"weight": 7
+			},
+			{
+				"word": "technology",
+				"weight": 7
+			},
+			{
+				"word": "investors",
+				"weight": 5
+			},
+			{
+				"word": "Austin",
+				"weight": 5
+			},
+			{
+				"word": "vehicles",
+				"weight": 4
+			},
+			{
+				"word": "Musk",
+				"weight": 8
+			},
+			{
+				"word": "compliance",
+				"weight": 5
+			},
+			{
+				"word": "privacy",
+				"weight": 5
+			},
+			{
+				"word": "self-driving",
+				"weight": 6
+			}
+		],
+		"mentions_on_platform": [
+			{
+				"date": "2025-05-23",
+				"text": "Tesla will have 'robotaxis' on the streets of Austin, Texas, by the end of June, CEO Elon Musk told CNBC. The program will start with about 10 self-driving vehicles and rapidly expand to thousands if the launch goes off without incident. Financial experts advise investors to assess risk and perform due diligence before investing in disruptive technologies like autonomous vehicles.",
+				"sentiment": "positive",
+				"ethical_context": "Innovation ethics, responsible investing, and the societal impact of autonomous technology rollouts.",
+				"url": "https://www.cnbc.com/2025/05/23/musk-promises-tesla-robotaxis-what-to-know-about-investing-in-futuristic-tech.html"
+			},
+			{
+				"date": "2025-05-24",
+				"text": "Tesla stock has risen over the past month, riding momentum for a major event: the rollout of autonomous robotaxis in Austin, Texas. Wedbush Securities analyst Daniel Ives has raised his price target for Tesla, citing a 'golden age' of autonomous driving technology. He acknowledges that previous controversies involving CEO Elon Musk affected Tesla's brand but says a recommitted Musk is once again leading Tesla into the future.",
+				"sentiment": "positive",
+				"ethical_context": "Leadership accountability, brand reputation, and technological evolution in public transportation.",
+				"url": "https://www.thestreet.com/technology/analyst-sets-eye-popping-tesla-stock-price-target"
+			},
+			{
+				"date": "Recent",
+				"text": "Reuters says Musk's AI chatbot sifted federal data without DHS approval.",
+				"sentiment": "negative",
+				"ethical_context": "Data privacy and regulatory compliance relating to artificial intelligence applications.",
+				"url": "https://finance.yahoo.com/news/tesla-slides-grok-rolls-federal-160347875.html"
+			}
+		]
+	}
 }
