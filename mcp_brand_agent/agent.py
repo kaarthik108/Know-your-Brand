@@ -6,7 +6,7 @@ from typing import List, Dict, Literal
 from google.adk.models.lite_llm import LiteLlm
 from google.adk.tools import ToolContext
 from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParameters
-
+from .tool_helper import search_web
 class SentimentBreakdown(BaseModel):
     positive: float
     negative: float
@@ -63,12 +63,6 @@ class BrandSentimentReport(BaseModel):
 #     api_key=os.getenv("TOGETHERAI_API_KEY"),
 #     # max_tokens=93762
 # )
-
-# Import the MCP manager
-from .mcp_manager import mcp_manager
-
-# Use the singleton instance
-search_web = mcp_manager.get_toolset_sync()
 
 model_o4 = "gemini-2.0-flash"
 model_gemini = "gemini-2.5-flash-preview-04-17"
