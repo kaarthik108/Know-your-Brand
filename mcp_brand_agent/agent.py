@@ -89,22 +89,45 @@ def exit_loop(tool_context: ToolContext):
 # Create platform-specific search agents
 twitter_agent = LlmAgent(
     model=model_o4,
-    name='twitter_search_agent',
-    description="Searches Twitter/X for recent brand mentions",
+    name='twitter_agent',
+    description="Searches Twitter/X for brand mentions and provides analysis",
     instruction="""
-Find exactly 3 Twitter/X posts about the brand. Search using brand name, hashtags, and keywords.
+Search for exactly 3 Twitter/X posts about the brand, then analyze and return structured data.
 
-Return JSON array with 3 posts, each containing:
-- platform: "Twitter"
-- date: actual date or "Recent"
-- text: actual post content
-- sentiment: "positive", "negative", or "neutral"
-- ethical_context: relevant business/ethical theme
-- url: post link or x.com domain
+First, search using brand name, hashtags, and keywords from x.com domain only.
 
-Search multiple approaches if needed. No empty results - find real posts from x.com domain only.
+Then analyze the posts and return this JSON structure:
+{
+  "brand_name": "the brand name",
+  "platform_name": "Twitter",
+  "total_mentions_on_platform": 3,
+  "platform_sentiment_breakdown": {
+    "positive": 0.6,
+    "negative": 0.3,
+    "neutral": 0.1
+  },
+  "ethical_highlights_on_platform": [
+    "key ethical theme 1",
+    "key ethical theme 2"
+  ],
+  "word_cloud_themes_on_platform": [
+    {"word": "theme_word", "weight": 8}
+  ],
+  "mentions_on_platform": [
+    {
+      "date": "actual date or Recent",
+      "text": "actual post content",
+      "sentiment": "positive/negative/neutral",
+      "ethical_context": "relevant theme",
+      "url": "post link or x.com domain"
+    }
+  ]
+}
+
+Extract 10+ significant words for word_cloud_themes_on_platform. Return only valid JSON.
     """,
     tools=[search_web],
+    # output_schema=SinglePlatformAnalysisReport,
     output_key="twitter_results"
 )
 
@@ -117,22 +140,45 @@ Search multiple approaches if needed. No empty results - find real posts from x.
 
 linkedin_agent = LlmAgent(
     model=model_o4,
-    name='linkedin_search_agent',
-    description="Searches LinkedIn for recent brand mentions",
+    name='linkedin_agent',
+    description="Searches LinkedIn for brand mentions and provides analysis",
     instruction="""
-Find exactly 3 LinkedIn posts about the brand. Search company pages, executives, and industry posts.
+Search for exactly 3 LinkedIn posts about the brand, then analyze and return structured data.
 
-Return JSON array with 3 posts, each containing:
-- platform: "LinkedIn"
-- date: actual date or "Recent"
-- text: actual post content
-- sentiment: "positive", "negative", or "neutral"
-- ethical_context: relevant business/ethical theme
-- url: post link or linkedin.com domain
+First, search company pages, executives, and industry posts from linkedin.com domain only.
 
-Search multiple approaches if needed. No empty results - find real posts from linkedin.com domain only.
+Then analyze the posts and return this JSON structure:
+{
+  "brand_name": "the brand name",
+  "platform_name": "LinkedIn",
+  "total_mentions_on_platform": 3,
+  "platform_sentiment_breakdown": {
+    "positive": 0.6,
+    "negative": 0.3,
+    "neutral": 0.1
+  },
+  "ethical_highlights_on_platform": [
+    "key ethical theme 1",
+    "key ethical theme 2"
+  ],
+  "word_cloud_themes_on_platform": [
+    {"word": "theme_word", "weight": 8}
+  ],
+  "mentions_on_platform": [
+    {
+      "date": "actual date or Recent",
+      "text": "actual post content",
+      "sentiment": "positive/negative/neutral",
+      "ethical_context": "relevant theme",
+      "url": "post link or linkedin.com domain"
+    }
+  ]
+}
+
+Extract 10+ significant words for word_cloud_themes_on_platform. Return only valid JSON.
     """,
     tools=[search_web],
+    # output_schema=SinglePlatformAnalysisReport,
     output_key="linkedin_results"
 )
 
@@ -145,22 +191,45 @@ Search multiple approaches if needed. No empty results - find real posts from li
 
 reddit_agent = LlmAgent(
     model=model_gemini,
-    name='reddit_search_agent',
-    description="Searches Reddit for recent brand mentions",
+    name='reddit_agent',
+    description="Searches Reddit for brand mentions and provides analysis",
     instruction="""
-Find exactly 3 Reddit posts about the brand. Search relevant subreddits and brand discussions.
+Search for exactly 3 Reddit posts about the brand, then analyze and return structured data.
 
-Return JSON array with 3 posts, each containing:
-- platform: "Reddit"
-- date: actual date or "Recent"
-- text: actual post content
-- sentiment: "positive", "negative", or "neutral"
-- ethical_context: relevant business/ethical theme
-- url: post link or reddit.com domain
+First, search relevant subreddits and brand discussions from reddit.com domain only.
 
-Search multiple subreddits if needed. No empty results - find real posts from reddit.com domain only.
+Then analyze the posts and return this JSON structure:
+{
+  "brand_name": "the brand name",
+  "platform_name": "Reddit",
+  "total_mentions_on_platform": 3,
+  "platform_sentiment_breakdown": {
+    "positive": 0.6,
+    "negative": 0.3,
+    "neutral": 0.1
+  },
+  "ethical_highlights_on_platform": [
+    "key ethical theme 1",
+    "key ethical theme 2"
+  ],
+  "word_cloud_themes_on_platform": [
+    {"word": "theme_word", "weight": 8}
+  ],
+  "mentions_on_platform": [
+    {
+      "date": "actual date or Recent",
+      "text": "actual post content",
+      "sentiment": "positive/negative/neutral",
+      "ethical_context": "relevant theme",
+      "url": "post link or reddit.com domain"
+    }
+  ]
+}
+
+Extract 10+ significant words for word_cloud_themes_on_platform. Return only valid JSON.
     """,
     tools=[search_web],
+    # output_schema=SinglePlatformAnalysisReport,
     output_key="reddit_results"
 )
 
@@ -173,22 +242,45 @@ Search multiple subreddits if needed. No empty results - find real posts from re
 
 news_agent = LlmAgent(
     model=model_o4,
-    name='news_search_agent',
-    description="Searches news sites for recent brand mentions",
+    name='news_agent',
+    description="Searches news sites for brand mentions and provides analysis",
     instruction="""
-Find exactly 3 news articles about the brand. Search major news sites and industry publications.
+Search for exactly 3 news articles about the brand, then analyze and return structured data.
 
-Return JSON array with 3 articles, each containing:
-- platform: "News"
-- date: actual date or "Recent"
-- text: actual article excerpt
-- sentiment: "positive", "negative", or "neutral"
-- ethical_context: relevant business/ethical theme
-- url: article link or news site domain
+First, search major news sites and industry publications from reputable news sites only.
 
-Search multiple news sources if needed. No empty results - find real articles from reputable news sites only.
+Then analyze the articles and return this JSON structure:
+{
+  "brand_name": "the brand name",
+  "platform_name": "News",
+  "total_mentions_on_platform": 3,
+  "platform_sentiment_breakdown": {
+    "positive": 0.6,
+    "negative": 0.3,
+    "neutral": 0.1
+  },
+  "ethical_highlights_on_platform": [
+    "key ethical theme 1",
+    "key ethical theme 2"
+  ],
+  "word_cloud_themes_on_platform": [
+    {"word": "theme_word", "weight": 8}
+  ],
+  "mentions_on_platform": [
+    {
+      "date": "actual date or Recent",
+      "text": "actual article excerpt",
+      "sentiment": "positive/negative/neutral",
+      "ethical_context": "relevant theme",
+      "url": "article link or news site domain"
+    }
+  ]
+}
+
+Extract 10+ significant words for word_cloud_themes_on_platform. Return only valid JSON.
     """,
     tools=[search_web],
+    # output_schema=SinglePlatformAnalysisReport,
     output_key="news_results"
 )
 
@@ -200,268 +292,14 @@ Search multiple news sources if needed. No empty results - find real articles fr
 # )
 # Create platform search sequential agent
 
-# Create platform-specific analysis agents
-twitter_analysis_agent = LlmAgent(
-    model=model_o4,
-    name='twitter_analysis_agent',
-    description="Analyzes Twitter brand mentions to provide platform-specific insights",
-    instruction="""
-You are a brand reputation analyst specializing in Twitter data. Your task is to:
-1. Review all the Twitter mentions provided for the brand. The Twitter mentions are available as a JSON array in the {twitter_results} variable.
-2. Analyze the sentiment for these Twitter mentions.
-3. Identify key ethical themes or issues mentioned specifically on Twitter.
-4. Extract important theme words (nouns, verbs, adjectives) from Twitter mentions for a word cloud.
-5. Provide a structured summary for Twitter.
-
-Analyze these mentions and provide your insights following this structure for Twitter:
-{
-  "brand_name": "the brand name",
-  "platform_name": "Twitter",
-  "total_mentions_on_platform": "number of Twitter mentions found, as an integer",
-  "platform_sentiment_breakdown": {
-    "positive": "percentage (as number, e.g., 0.6 for 60%)",
-    "negative": "percentage (as number, e.g., 0.3 for 30%)",
-    "neutral": "percentage (as number, e.g., 0.1 for 10%)"
-  },
-  "ethical_highlights_on_platform": [
-    "key ethical theme 1 from Twitter",
-    "key ethical theme 2 from Twitter"
-  ],
-  "word_cloud_themes_on_platform": [
-    {
-      "word": "theme_word_1_twitter",
-      "weight": "frequency/importance score (integer 1-10)"
-    },
-    {
-      "word": "theme_word_2_twitter",
-      "weight": "frequency/importance score (integer 1-10)"
-    }
-  ],
-  "mentions_on_platform": [
-    {
-      "date": "date of mention",
-      "text": "content of mention",
-      "sentiment": "sentiment of mention",
-      "ethical_context": "ethical context",
-      "url": "url to the mention"
-    }
-  ]
-}
-
-For the word_cloud_themes_on_platform, extract at least 10 significant nouns, verbs, and adjectives from the Twitter mentions.
-The "mentions_on_platform" field should be the direct list of mentions received in twitter_results.
-IMPORTANT: YOUR RESPONSE MUST BE ONLY THE JSON OBJECT. DO NOT INCLUDE ANY OTHER TEXT, MARKDOWN, OR EXPLANATIONS.
-ALL THE FIELDS MUST BE IN DOUBLE QUOTES (KEYS AND VALUES). Ensure all numerical values are actual numbers, not strings.
-Make sure your response is valid JSON that can be parsed.
-    """,
-    output_schema=SinglePlatformAnalysisReport,
-    output_key="analysis_results_twitter"
-)
-
-linkedin_analysis_agent = LlmAgent(
-    model=model_o4,
-    name='linkedin_analysis_agent',
-    description="Analyzes LinkedIn brand mentions to provide platform-specific insights",
-    instruction="""
-You are a brand reputation analyst specializing in LinkedIn data. Your task is to:
-1. Review all the LinkedIn mentions provided for the brand. The LinkedIn mentions are available as a JSON array in the {linkedin_results} variable.
-2. Analyze the sentiment for these LinkedIn mentions.
-3. Identify key ethical themes or issues mentioned specifically on LinkedIn.
-4. Extract important theme words (nouns, verbs, adjectives) from LinkedIn mentions for a word cloud.
-5. Provide a structured summary for LinkedIn.
-
-Analyze these mentions and provide your insights following this structure for LinkedIn:
-{
-  "brand_name": "the brand name",
-  "platform_name": "LinkedIn",
-  "total_mentions_on_platform": "number of LinkedIn mentions found, as an integer",
-  "platform_sentiment_breakdown": {
-    "positive": "percentage (as number, e.g., 0.6 for 60%)",
-    "negative": "percentage (as number, e.g., 0.3 for 30%)",
-    "neutral": "percentage (as number, e.g., 0.1 for 10%)"
-  },
-  "ethical_highlights_on_platform": [
-    "key ethical theme 1 from LinkedIn",
-    "key ethical theme 2 from LinkedIn"
-  ],
-  "word_cloud_themes_on_platform": [
-    {
-      "word": "theme_word_1_linkedin",
-      "weight": "frequency/importance score (integer 1-10)"
-    },
-    {
-      "word": "theme_word_2_linkedin",
-      "weight": "frequency/importance score (integer 1-10)"
-    }
-  ],
-  "mentions_on_platform": [
-    {
-      "date": "date of mention",
-      "text": "content of mention",
-      "sentiment": "sentiment of mention",
-      "ethical_context": "ethical context",
-      "url": "url to the mention"
-    }
-  ]
-}
-
-For the word_cloud_themes_on_platform, extract at least 10 significant nouns, verbs, and adjectives from the LinkedIn mentions.
-The "mentions_on_platform" field should be the direct list of mentions received in linkedin_results.
-IMPORTANT: YOUR RESPONSE MUST BE ONLY THE JSON OBJECT. DO NOT INCLUDE ANY OTHER TEXT, MARKDOWN, OR EXPLANATIONS.
-ALL THE FIELDS MUST BE IN DOUBLE QUOTES (KEYS AND VALUES). Ensure all numerical values are actual numbers, not strings.
-Make sure your response is valid JSON that can be parsed.
-    """,
-    output_schema=SinglePlatformAnalysisReport,
-    output_key="analysis_results_linkedin"
-)
-
-reddit_analysis_agent = LlmAgent(
-    model=model_gemini,
-    name='reddit_analysis_agent',
-    description="Analyzes Reddit brand mentions to provide platform-specific insights",
-    instruction="""
-You are a brand reputation analyst specializing in Reddit data. Your task is to:
-1. Review all the Reddit mentions provided for the brand. The Reddit mentions are available as a JSON array in the {reddit_results} variable.
-2. Analyze the sentiment for these Reddit mentions.
-3. Identify key ethical themes or issues mentioned specifically on Reddit.
-4. Extract important theme words (nouns, verbs, adjectives) from Reddit mentions for a word cloud.
-5. Provide a structured summary for Reddit.
-
-Analyze these mentions and provide your insights following this structure for Reddit:
-{
-  "brand_name": "the brand name",
-  "platform_name": "Reddit",
-  "total_mentions_on_platform": "number of Reddit mentions found, as an integer",
-  "platform_sentiment_breakdown": {
-    "positive": "percentage (as number, e.g., 0.6 for 60%)",
-    "negative": "percentage (as number, e.g., 0.3 for 30%)",
-    "neutral": "percentage (as number, e.g., 0.1 for 10%)"
-  },
-  "ethical_highlights_on_platform": [
-    "key ethical theme 1 from Reddit",
-    "key ethical theme 2 from Reddit"
-  ],
-  "word_cloud_themes_on_platform": [
-    {
-      "word": "theme_word_1_reddit",
-      "weight": "frequency/importance score (integer 1-10)"
-    },
-    {
-      "word": "theme_word_2_reddit",
-      "weight": "frequency/importance score (integer 1-10)"
-    }
-  ],
-  "mentions_on_platform": [
-    {
-      "date": "date of mention",
-      "text": "content of mention",
-      "sentiment": "sentiment of mention",
-      "ethical_context": "ethical context",
-      "url": "url to the mention"
-    }
-  ]
-}
-
-For the word_cloud_themes_on_platform, extract at least 10 significant nouns, verbs, and adjectives from the Reddit mentions.
-The "mentions_on_platform" field should be the direct list of mentions received in reddit_results.
-IMPORTANT: YOUR RESPONSE MUST BE ONLY THE JSON OBJECT. DO NOT INCLUDE ANY OTHER TEXT, MARKDOWN, OR EXPLANATIONS.
-ALL THE FIELDS MUST BE IN DOUBLE QUOTES (KEYS AND VALUES). Ensure all numerical values are actual numbers, not strings.
-Make sure your response is valid JSON that can be parsed.
-    """,
-    output_schema=SinglePlatformAnalysisReport,
-    output_key="analysis_results_reddit"
-)
-
-news_analysis_agent = LlmAgent(
-    model=model_o4,
-    name='news_analysis_agent',
-    description="Analyzes News brand mentions to provide platform-specific insights",
-    instruction="""
-You are a brand reputation analyst specializing in News data. Your task is to:
-1. Review all the News mentions provided for the brand. The News mentions are available as a JSON array in the {news_results} variable.
-2. Analyze the sentiment for these News mentions.
-3. Identify key ethical themes or issues mentioned specifically in News articles.
-4. Extract important theme words (nouns, verbs, adjectives) from News mentions for a word cloud.
-5. Provide a structured summary for News.
-
-Analyze these mentions and provide your insights following this structure for News:
-{
-  "brand_name": "the brand name",
-  "platform_name": "News",
-  "total_mentions_on_platform": "number of News mentions found, as an integer",
-  "platform_sentiment_breakdown": {
-    "positive": "percentage (as number, e.g., 0.6 for 60%)",
-    "negative": "percentage (as number, e.g., 0.3 for 30%)",
-    "neutral": "percentage (as number, e.g., 0.1 for 10%)"
-  },
-  "ethical_highlights_on_platform": [
-    "key ethical theme 1 from News",
-    "key ethical theme 2 from News"
-  ],
-  "word_cloud_themes_on_platform": [
-    {
-      "word": "theme_word_1_news",
-      "weight": "frequency/importance score (integer 1-10)"
-    },
-    {
-      "word": "theme_word_2_news",
-      "weight": "frequency/importance score (integer 1-10)"
-    }
-  ],
-  "mentions_on_platform": [
-    {
-      "date": "date of mention",
-      "text": "content of mention",
-      "sentiment": "sentiment of mention",
-      "ethical_context": "ethical context",
-      "url": "url to the mention"
-    }
-  ]
-}
-
-For the word_cloud_themes_on_platform, extract at least 10 significant nouns, verbs, and adjectives from the News mentions.
-The "mentions_on_platform" field should be the direct list of mentions received in news_results.
-IMPORTANT: YOUR RESPONSE MUST BE ONLY THE JSON OBJECT. DO NOT INCLUDE ANY OTHER TEXT, MARKDOWN, OR EXPLANATIONS.
-ALL THE FIELDS MUST BE IN DOUBLE QUOTES (KEYS AND VALUES). Ensure all numerical values are actual numbers, not strings.
-Make sure your response is valid JSON that can be parsed.
-    """,
-    output_schema=SinglePlatformAnalysisReport,
-    output_key="analysis_results_news"
-)
-
-
-twitter_sequential_agent = SequentialAgent(
-    name="twitter_sequential_agent",
-    description="Runs the twitter_search_agent and twitter_analysis_agent sequentially",
-    sub_agents=[twitter_agent, twitter_analysis_agent]
-)
-
-linkedin_sequential_agent = SequentialAgent(
-    name="linkedin_sequential_agent",
-    description="Runs the linkedin_search_agent and linkedin_analysis_agent sequentially",
-    sub_agents=[linkedin_agent, linkedin_analysis_agent]
-)
-
-reddit_sequential_agent = SequentialAgent(
-    name="reddit_sequential_agent",
-    description="Runs the reddit_search_agent and reddit_analysis_agent sequentially",
-    sub_agents=[reddit_agent, reddit_analysis_agent]
-)
-
-news_sequential_agent = SequentialAgent(
-    name="news_sequential_agent",
-    description="Runs the news_search_agent and news_analysis_agent sequentially",
-    sub_agents=[news_agent, news_analysis_agent]
-)
-
 
 root_agent = ParallelAgent(
     name="root_agent",
-    description="Coordinates parallel analysis of brand mentions for each platform.",
+    description="Searches and analyzes brand mentions across multiple platforms in parallel.",
     sub_agents=[
-        twitter_sequential_agent,
-        linkedin_sequential_agent,
-        reddit_sequential_agent,
-        news_sequential_agent
+        twitter_agent,
+        linkedin_agent,
+        reddit_agent,
+        news_agent
     ]
 )
