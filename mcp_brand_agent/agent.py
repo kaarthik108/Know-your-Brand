@@ -1,10 +1,10 @@
 import os
+import asyncio
 from google.adk.agents import LlmAgent, ParallelAgent, LoopAgent, SequentialAgent
 from pydantic import BaseModel
 from typing import List, Dict, Literal
 from google.adk.models.lite_llm import LiteLlm
 from google.adk.tools import ToolContext
-# from .tool_helper import search_web
 from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParameters
 
 class SentimentBreakdown(BaseModel):
@@ -64,17 +64,11 @@ class BrandSentimentReport(BaseModel):
 #     # max_tokens=93762
 # )
 
-search_web = MCPToolset(
-    connection_params=StdioServerParameters(
-                command='npx',
-                args=["-y", "@brightdata/mcp"],
-                env={
-                    "API_TOKEN": os.getenv("MCP_TOKEN"),
-                    "WEB_UNLOCKER_ZONE": "web_unlocker1",
-                    # "BROWSER_AUTH": "SBR_USER:SBR_PASS"
-                }
-            )
-)
+# Import the MCP manager
+from .mcp_manager import mcp_manager
+
+# Use the singleton instance
+search_web = mcp_manager.get_toolset_sync()
 
 model_o4 = "gemini-2.0-flash"
 model_gemini = "gemini-2.5-flash-preview-04-17"

@@ -7,7 +7,7 @@ from typing import Any, Dict, Optional
 import threading
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from google.adk.runners import Runner
@@ -39,14 +39,14 @@ app.add_middleware(
 )
 
 # Initialize database tables on startup
-# @app.on_event("startup")
-# async def startup_event():
-#     try:
-#         db_manager.init_tables()
-#         logger.info("Database initialized successfully")
-#     except Exception as e:
-#         logger.error(f"Failed to initialize database: {e}")
-#         raise
+@app.on_event("startup")
+async def startup_event():
+    try:
+        db_manager.init_tables()
+        logger.info("Database initialized successfully")
+    except Exception as e:
+        logger.error(f"Failed to initialize database: {e}")
+        raise
 
 
 def init_session_service() -> DatabaseSessionService:
@@ -74,69 +74,67 @@ except Exception as e:
 # session_service = InMemorySessionService()
 
 
-async def run_agent_logic_background(
+def run_agent_logic_background_sync(
     user_id: str, session_id: str, question: str, brand_name: str
 ):
     """
-    Background task to run the agent logic and update database status
+    Synchronous wrapper for background task to avoid async issues
     """
     try:
         # Update status to running
         db_manager.update_status(user_id, session_id, "running")
+        logger.info(f"Started analysis for user {user_id}, session {session_id}, brand {brand_name}")
         
-        # Run the actual agent logic
-        result = await run_agent_logic(user_id, session_id, question)
+        # Create a new event loop for this thread
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         
-        # Get updated session after agent execution
-        updated_session = await session_service.get_session(
-            app_name=APP_NAME,
-            user_id=user_id,
-            session_id=session_id,
-        )
-        
-        analysis_results_twitter = updated_session.state.get("final_twitter_results", {})
-        analysis_results_linkedin = updated_session.state.get("final_linkedin_results", {})
-        analysis_results_reddit = updated_session.state.get("final_reddit_results", {})
-        analysis_results_news = updated_session.state.get("final_news_results", {})
-        
-        # Parse JSON strings if needed
-        if isinstance(analysis_results_twitter, str):
-            try:
-                analysis_results_twitter = json.loads(analysis_results_twitter)
-            except json.JSONDecodeError:
-                analysis_results_twitter = {"analysis_results_twitter": analysis_results_twitter}
-                
-        if isinstance(analysis_results_linkedin, str):
-            try:
-                analysis_results_linkedin = json.loads(analysis_results_linkedin)
-            except json.JSONDecodeError:
-                analysis_results_linkedin = {"analysis_results_linkedin": analysis_results_linkedin}
-                
-        if isinstance(analysis_results_reddit, str):
-            try:
-                analysis_results_reddit = json.loads(analysis_results_reddit)
-            except json.JSONDecodeError:
-                analysis_results_reddit = {"analysis_results_reddit": analysis_results_reddit}
-                
-        if isinstance(analysis_results_news, str):
-            try:
-                analysis_results_news = json.loads(analysis_results_news)
-            except json.JSONDecodeError:
-                analysis_results_news = {"analysis_results_news": analysis_results_news}
+        try:
+            # Run the actual agent logic
+            result = loop.run_until_complete(run_agent_logic(user_id, session_id, question))
+            
+            # Get updated session after agent execution
+            updated_session = loop.run_until_complete(session_service.get_session(
+                app_name=APP_NAME,
+                user_id=user_id,
+                session_id=session_id,
+            ))
+            
+            analysis_results_twitter = updated_session.state.get("final_twitter_results", {})
+            analysis_results_linkedin = updated_session.state.get("final_linkedin_results", {})
+            analysis_results_reddit = updated_session.state.get("final_reddit_results", {})
+            analysis_results_news = updated_session.state.get("final_news_results", {})
+            
+            # Parse JSON strings if needed
+            def parse_result(result_data):
+                if isinstance(result_data, str):
+                    try:
+                        return json.loads(result_data)
+                    except json.JSONDecodeError:
+                        return {"raw_data": result_data}
+                return result_data if result_data else {}
+            
+            analysis_results_twitter = parse_result(analysis_results_twitter)
+            analysis_results_linkedin = parse_result(analysis_results_linkedin)
+            analysis_results_reddit = parse_result(analysis_results_reddit)
+            analysis_results_news = parse_result(analysis_results_news)
 
-        response_data = {
-            "userId": user_id,
-            "sessionId": session_id,
-            "brand_name": brand_name,
-            "analysis_results_twitter": analysis_results_twitter if analysis_results_twitter else {},
-            "analysis_results_linkedin": analysis_results_linkedin if analysis_results_linkedin else {},
-            "analysis_results_reddit": analysis_results_reddit if analysis_results_reddit else {},
-            "analysis_results_news": analysis_results_news if analysis_results_news else {}
-        }
-        
-        # Save results to database
-        db_manager.save_results(user_id, session_id, response_data)
-        logger.info(f"Analysis completed successfully for user {user_id}, session {session_id}")
+            response_data = {
+                "userId": user_id,
+                "sessionId": session_id,
+                "brand_name": brand_name,
+                "analysis_results_twitter": analysis_results_twitter,
+                "analysis_results_linkedin": analysis_results_linkedin,
+                "analysis_results_reddit": analysis_results_reddit,
+                "analysis_results_news": analysis_results_news
+            }
+            
+            # Save results to database
+            db_manager.save_results(user_id, session_id, response_data)
+            logger.info(f"Analysis completed successfully for user {user_id}, session {session_id}")
+            
+        finally:
+            loop.close()
         
     except Exception as e:
         logger.error(f"Error in background analysis for user {user_id}, session {session_id}: {e}")
@@ -255,7 +253,7 @@ class QueryRequest(BaseModel):
 
 
 @app.post("/query")
-async def query_endpoint(request_data: QueryRequest, background_tasks: BackgroundTasks):
+async def query_endpoint(request_data: QueryRequest):
     try:
         # Extract brand name from question if not provided
         brand_name = request_data.brand_name or request_data.question.split()[0] if request_data.question else "Unknown"
@@ -273,14 +271,18 @@ async def query_endpoint(request_data: QueryRequest, background_tasks: Backgroun
             request_data.sessionId
         )
         
-        # Start background task for analysis
-        background_tasks.add_task(
-            run_agent_logic_background,
-            request_data.userId,
-            request_data.sessionId,
-            request_data.question,
-            brand_name
+        # Start background task for analysis using threading
+        thread = threading.Thread(
+            target=run_agent_logic_background_sync,
+            args=(
+                request_data.userId,
+                request_data.sessionId,
+                request_data.question,
+                brand_name
+            ),
+            daemon=True
         )
+        thread.start()
         
         # Return immediate response with request ID and status
         return {
