@@ -294,7 +294,7 @@ Extract 10+ significant words for word_cloud_themes_on_platform. Return only val
 
 
 root_agent = ParallelAgent(
-    name="root_agent",
+    name="mcp_brand_agent",
     description="Searches and analyzes brand mentions across multiple platforms in parallel.",
     sub_agents=[
         twitter_agent,
