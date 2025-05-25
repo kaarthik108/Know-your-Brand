@@ -32,7 +32,7 @@ jobs:
           --region us-central1 \
           --project gen-lang-client-0782705766 \
           --allow-unauthenticated \
-          --set-env-vars="GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT,GOOGLE_CLOUD_LOCATION=$GOOGLE_CLOUD_LOCATION,GOOGLE_GENAI_USE_VERTEXAI=$GOOGLE_GENAI_USE_VERTEXAI,OPENAI_API_KEY=$OPENAI_API_KEY,GROQ_API_KEY=$GROQ_API_KEY,MCP_TOKEN=$MCP_TOKEN,GOOGLE_API_KEY=$GOOGLE_API_KEY"
+          --set-env-vars="GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT,GOOGLE_CLOUD_LOCATION=$GOOGLE_CLOUD_LOCATION,GOOGLE_GENAI_USE_VERTEXAI=$GOOGLE_GENAI_USE_VERTEXAI,OPENAI_API_KEY=$OPENAI_API_KEY,GROQ_API_KEY=$GROQ_API_KEY,MCP_TOKEN=$MCP_TOKEN,GOOGLE_API_KEY=$GOOGLE_API_KEY,user=$user,password=$password,host=$host,port=$port,dbname=$dbname"
       env:
         GOOGLE_CLOUD_PROJECT: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
         GOOGLE_CLOUD_LOCATION: ${{ secrets.GOOGLE_CLOUD_LOCATION }}
@@ -41,4 +41,9 @@ jobs:
         GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         MCP_TOKEN: ${{ secrets.MCP_TOKEN }}
         GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        user: ${{ secrets.user }}
+        password: ${{ secrets.password }}
+        host: ${{ secrets.host }}
+        port: ${{ secrets.port }}
+        dbname: ${{ secrets.dbname }}
         # SESSION_DB_URL: ${{ secrets.SESSION_DB_URL }}
