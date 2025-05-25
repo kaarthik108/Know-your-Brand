@@ -5,7 +5,6 @@ from pydantic import BaseModel
 from typing import List, Dict, Literal
 from google.adk.models.lite_llm import LiteLlm
 from google.adk.tools import ToolContext
-from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParameters
 from .tool_helper import search_web
 class SentimentBreakdown(BaseModel):
     positive: float
