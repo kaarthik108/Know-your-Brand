@@ -131,6 +131,27 @@ Extract 10+ significant words for word_cloud_themes_on_platform. Return only val
     output_key="twitter_results"
 )
 
+twitter_extract_agent = LlmAgent(
+    model=model_gemini,
+    name='twitter_extract_agent',
+    description="Extracts the results from the twitter_agent in the structured JSON format",
+    instruction="""
+    Extract the results from the twitter_agent 
+
+    {twitter_results}
+
+    Return the results in the structured JSON format: 
+    """,
+    output_key="final_twitter_results",
+    output_schema= SinglePlatformAnalysisReport
+)
+
+twitter_sequential_agent = SequentialAgent(
+    name="twitter_sequential_agent",
+    description="Runs the twitter_agent and twitter_extract_agent sequentially",
+    sub_agents=[twitter_agent, twitter_extract_agent]
+)
+
 # twitter_loop_agent = LoopAgent(
 #     name="twitter_loop_agent",
 #     description="Loop agent for Twitter search",
@@ -182,6 +203,27 @@ Extract 10+ significant words for word_cloud_themes_on_platform. Return only val
     output_key="linkedin_results"
 )
 
+linkedin_extract_agent = LlmAgent(
+    model=model_gemini,
+    name='linkedin_extract_agent',
+    description="Extracts the results from the linkedin_agent in the structured JSON format",
+    instruction="""
+    Extract the results from the linkedin_agent and return the results in the structured JSON format: 
+
+    {linkedin_results}
+
+    Return the results in the structured JSON format: 
+    """,
+    output_key="final_linkedin_results",
+    output_schema= SinglePlatformAnalysisReport
+)
+
+linkedin_sequential_agent = SequentialAgent(
+    name="linkedin_sequential_agent",
+    description="Runs the linkedin_agent and linkedin_extract_agent sequentially",
+    sub_agents=[linkedin_agent, linkedin_extract_agent]
+)
+
 # linkedin_loop_agent = LoopAgent(
 #     name="linkedin_loop_agent",
 #     description="Loop agent for LinkedIn search",
@@ -190,7 +232,7 @@ Extract 10+ significant words for word_cloud_themes_on_platform. Return only val
 # )
 
 reddit_agent = LlmAgent(
-    model=model_gemini,
+    model=model_o4,
     name='reddit_agent',
     description="Searches Reddit for brand mentions and provides analysis",
     instruction="""
@@ -232,6 +274,28 @@ Extract 10+ significant words for word_cloud_themes_on_platform. Return only val
     # output_schema=SinglePlatformAnalysisReport,
     output_key="reddit_results"
 )
+
+reddit_extract_agent = LlmAgent(
+    name='reddit_extract_agent',
+    model=model_gemini,
+    description="Extracts the results from the reddit_agent in the structured JSON format",
+    instruction="""
+    Extract the results from the reddit_agent and return the results in the structured JSON format: 
+
+    {reddit_results}
+
+    Return the results in the structured JSON format: 
+    """,
+    output_key="final_reddit_results",
+    output_schema= SinglePlatformAnalysisReport
+)
+
+reddit_sequential_agent = SequentialAgent(
+    name="reddit_sequential_agent",
+    description="Runs the reddit_agent and reddit_extract_agent sequentially",
+    sub_agents=[reddit_agent, reddit_extract_agent]
+)
+
 
 # reddit_loop_agent = LoopAgent(
 #     name="reddit_loop_agent",
@@ -284,6 +348,27 @@ Extract 10+ significant words for word_cloud_themes_on_platform. Return only val
     output_key="news_results"
 )
 
+news_extract_agent = LlmAgent(
+    name='news_extract_agent',
+    model=model_gemini,
+    description="Extracts the results from the news_agent in the structured JSON format",
+    instruction="""
+    Extract the results from the news_agent and return the results in the structured JSON format: 
+
+    {news_results}
+
+    Return the results in the structured JSON format: 
+    """,
+    output_key="final_news_results",
+    output_schema= SinglePlatformAnalysisReport
+)
+
+news_sequential_agent = SequentialAgent(
+    name="news_sequential_agent",
+    description="Runs the news_agent and news_extract_agent sequentially",
+    sub_agents=[news_agent, news_extract_agent]
+)
+
 # news_loop_agent = LoopAgent(
 #     name="news_loop_agent",
 #     description="Loop agent for news search",
@@ -297,9 +382,9 @@ root_agent = ParallelAgent(
     name="mcp_brand_agent",
     description="Searches and analyzes brand mentions across multiple platforms in parallel.",
     sub_agents=[
-        twitter_agent,
-        linkedin_agent,
-        reddit_agent,
-        news_agent
+        twitter_sequential_agent,
+        linkedin_sequential_agent,
+        reddit_sequential_agent,
+        news_sequential_agent
     ]
 )

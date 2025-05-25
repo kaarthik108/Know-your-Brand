@@ -108,7 +108,6 @@ async def run_agent_logic(
                     continue
 
                 response_text = event.content.parts[0].text
-                print(f"Response text:\n\n {response_text}\n\n")
                 try:
                     final_response = json.loads(response_text)
                 except json.JSONDecodeError:
@@ -198,11 +197,12 @@ async def query_endpoint(request_data: QueryRequest):
             user_id=request_data.userId,
             session_id=request_data.sessionId,
         )
-        analysis_results_twitter = updated_session.state.get("analysis_results_twitter", {})
-        analysis_results_linkedin = updated_session.state.get("analysis_results_linkedin", {})
-        analysis_results_reddit = updated_session.state.get("analysis_results_reddit", {})
-        analysis_results_news = updated_session.state.get("analysis_results_news", {})
+        analysis_results_twitter = updated_session.state.get("final_twitter_results", {})
+        analysis_results_linkedin = updated_session.state.get("final_linkedin_results", {})
+        analysis_results_reddit = updated_session.state.get("final_reddit_results", {})
+        analysis_results_news = updated_session.state.get("final_news_results", {})
         
+        print(f"Analysis results:\n\n {analysis_results_twitter}\n\n")
         if isinstance(analysis_results_twitter, str) or isinstance(analysis_results_linkedin, str) or isinstance(analysis_results_reddit, str) or isinstance(analysis_results_news, str):
             try:
                 import json
