@@ -11,7 +11,7 @@ from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from google.adk.runners import Runner
-from google.adk.sessions import InMemorySessionService
+from google.adk.sessions import InMemorySessionService, DatabaseSessionService
 from google.genai import types
 
 from mcp_brand_agent.agent import root_agent
@@ -26,6 +26,8 @@ logger = logging.getLogger(__name__)
 APP_NAME = os.environ.get("APP_NAME", "mcp_brand_agent")
 
 ALLOWED_ORIGINS = ["*"]
+
+SESSION_DB_URL = os.environ.get("SESSION_DB_URL")
 
 app = FastAPI()
 app.add_middleware(
@@ -47,29 +49,29 @@ app.add_middleware(
 #         raise
 
 
-# def init_session_service() -> DatabaseSessionService:
-#     try:
-#         service = DatabaseSessionService(db_url=SESSION_DB_URL)
+def init_session_service() -> DatabaseSessionService:
+    try:
+        service = DatabaseSessionService(db_url=SESSION_DB_URL)
 
-#         if service is None:
-#             raise RuntimeError("DatabaseSessionService constructor returned None")
+        if service is None:
+            raise RuntimeError("DatabaseSessionService constructor returned None")
 
-#         print(f"DatabaseSessionService initialized successfully. Type: {type(service)}")
-#         return service
-#     except Exception as e:
-#         print(f"Failed to initialize DatabaseSessionService: {e}")
-#         print(f"Exception type: {type(e)}")
-#         raise RuntimeError(f"Failed to initialize DatabaseSessionService: {e}")
+        print(f"DatabaseSessionService initialized successfully. Type: {type(service)}")
+        return service
+    except Exception as e:
+        print(f"Failed to initialize DatabaseSessionService: {e}")
+        print(f"Exception type: {type(e)}")
+        raise RuntimeError(f"Failed to initialize DatabaseSessionService: {e}")
 
 
-# try:
-#     session_service = init_session_service()
-#     print(f"Global session_service initialized: {type(session_service)}")
-# except Exception as e:
-#     print(f"CRITICAL: Failed to initialize global session_service: {e}")
-#     session_service = None
+try:
+    session_service = init_session_service()
+    print(f"Global session_service initialized: {type(session_service)}")
+except Exception as e:
+    print(f"CRITICAL: Failed to initialize global session_service: {e}")
+    session_service = None
 
-session_service = InMemorySessionService()
+# session_service = InMemorySessionService()
 
 
 async def run_agent_logic_background(
