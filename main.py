@@ -2,12 +2,12 @@ import os
 import uvicorn
 import json
 import logging
-import asyncio
 from typing import Any, Dict
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService, DatabaseSessionService
@@ -26,7 +26,7 @@ APP_NAME = os.environ.get("APP_NAME", "mcp_brand_agent")
 ALLOWED_ORIGINS = ["*"]
 
 SESSION_DB_URL = os.environ.get("SESSION_DB_URL")
-
+API_TOKEN = os.environ.get("API_TOKEN")
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -35,6 +35,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+security = HTTPBearer()
+
+def verify_bearer_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    if not credentials or credentials.scheme.lower() != "bearer":
+        raise HTTPException(status_code=401, detail="Invalid authentication scheme.")
+    if API_TOKEN is None or credentials.credentials != API_TOKEN:
+        raise HTTPException(status_code=401, detail="Invalid or missing token.")
+    return credentials.credentials
 
 def init_session_service() -> DatabaseSessionService:
     try:
@@ -232,7 +241,7 @@ async def process_brand_analysis_background(user_id: str, session_id: str, quest
 
 
 @app.post("/query")
-async def query_endpoint(request_data: QueryRequest, background_tasks: BackgroundTasks):
+async def query_endpoint(request_data: QueryRequest, background_tasks: BackgroundTasks, token: str = Depends(verify_bearer_token)):
     try:
         # Create database entry and get request ID
         request_id = db_manager.create_request(
@@ -268,7 +277,7 @@ async def query_endpoint(request_data: QueryRequest, background_tasks: Backgroun
 
 
 @app.get("/status/{user_id}/{session_id}")
-async def get_status(user_id: str, session_id: str):
+async def get_status(user_id: str, session_id: str, token: str = Depends(verify_bearer_token)):
     """
     Get the status of a brand analysis request
     """
