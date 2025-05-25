@@ -148,8 +148,7 @@ async def get_or_create_session(
             f"DEBUG: Attempting to get session for user_id={user_id}, session_id={session_id}"
         )
 
-        current_session = await asyncio.to_thread(
-            session_service.get_session,
+        current_session = await session_service.get_session(
             app_name=APP_NAME,
             user_id=user_id,
             session_id=session_id,
@@ -160,8 +159,7 @@ async def get_or_create_session(
                 f"Session not found for user {user_id}, session {session_id}. Creating new session."
             )
 
-            current_session = await asyncio.to_thread(
-                session_service.create_session,
+            current_session = await session_service.create_session(
                 app_name=APP_NAME,
                 user_id=user_id,
                 session_id=session_id,
@@ -195,8 +193,7 @@ async def query_endpoint(request_data: QueryRequest):
         )
 
         # Get updated session after agent execution
-        updated_session = await asyncio.to_thread(
-            session_service.get_session,
+        updated_session = await session_service.get_session(
             app_name=APP_NAME,
             user_id=request_data.userId,
             session_id=request_data.sessionId,
