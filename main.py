@@ -2,10 +2,12 @@ import os
 import uvicorn
 import json
 import logging
-from typing import Any, Dict
+import asyncio
+from typing import Any, Dict, Optional
+from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
@@ -15,6 +17,7 @@ from google.genai import types
 
 from mcp_brand_agent.agent import root_agent
 from database import db_manager
+
 # Load environment variables
 load_dotenv('.env')
 
@@ -27,6 +30,10 @@ ALLOWED_ORIGINS = ["*"]
 
 SESSION_DB_URL = os.environ.get("SESSION_DB_URL")
 API_TOKEN = os.environ.get("API_TOKEN")
+
+# Track background tasks
+background_tasks: Dict[str, asyncio.Task] = {}
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -59,7 +66,6 @@ def init_session_service() -> DatabaseSessionService:
         print(f"Exception type: {type(e)}")
         raise RuntimeError(f"Failed to initialize DatabaseSessionService: {e}")
 
-
 try:
     session_service = init_session_service()
     print(f"Global session_service initialized: {type(session_service)}")
@@ -67,23 +73,10 @@ except Exception as e:
     print(f"CRITICAL: Failed to initialize global session_service: {e}")
     session_service = None
 
-# session_service = InMemorySessionService()
+def get_task_key(user_id: str, session_id: str) -> str:
+    return f"{user_id}:{session_id}"
 
-
-async def run_agent_logic(
-    user_id: str, session_id: str, question: str
-) -> Dict[str, Any]:
-    """
-    Runs the agent logic asynchronously, using pre-updated session state.
-
-    Args:
-        user_id: Unique identifier for the user
-        session_id: Unique identifier for the session
-        question: The user's question or input
-
-    Returns:
-        Dictionary containing the agent's response
-    """
+async def run_agent_logic(user_id: str, session_id: str, question: str) -> Dict[str, Any]:
     try:
         agent = root_agent
     except Exception as e:
@@ -125,22 +118,8 @@ async def run_agent_logic(
 
     return final_response
 
-
-async def get_or_create_session(
-    user_id: str, session_id: str
-) -> Any:
-    """
-    Retrieves an existing session or creates a new one if it doesn't exist.
-
-    Args:
-        user_id: Unique identifier for the user
-        session_id: Unique identifier for the session
-
-    Returns:
-        Session object
-    """
+async def get_or_create_session(user_id: str, session_id: str) -> Any:
     try:
-        # Debug: Check if session_service is None
         if session_service is None:
             print("ERROR: session_service is None!")
             raise RuntimeError("Session service not initialized")
@@ -173,28 +152,21 @@ async def get_or_create_session(
         print(f"Error during session lookup/creation for session {session_id}: {e}")
         raise
 
-
 class QueryRequest(BaseModel):
     userId: str
     sessionId: str
     question: str
 
-
 async def process_brand_analysis_background(user_id: str, session_id: str, question: str):
-    """
-    Background task to process brand analysis
-    """
+    task_key = get_task_key(user_id, session_id)
+    
     try:
-        # Update status to processing
         db_manager.update_status(user_id, session_id, "processing")
         
-        # Get or create session
         await get_or_create_session(user_id, session_id)
 
-        # Run the agent logic
         await run_agent_logic(user_id, session_id, question)
 
-        # Get updated session after agent execution
         updated_session = await session_service.get_session(
             app_name=APP_NAME,
             user_id=user_id,
@@ -206,7 +178,6 @@ async def process_brand_analysis_background(user_id: str, session_id: str, quest
         analysis_results_reddit = updated_session.state.get("final_reddit_results", {})
         analysis_results_news = updated_session.state.get("final_news_results", {})
 
-        # Parse JSON strings if needed
         def parse_result(result_data):
             if isinstance(result_data, str):
                 try:
@@ -230,7 +201,6 @@ async def process_brand_analysis_background(user_id: str, session_id: str, quest
             "analysis_results_news": analysis_results_news
         }
 
-        # Save results and mark as completed
         db_manager.save_results(user_id, session_id, response_data)
         
         logger.info(f"Background processing completed for user {user_id}, session {session_id}")
@@ -238,27 +208,42 @@ async def process_brand_analysis_background(user_id: str, session_id: str, quest
     except Exception as e:
         logger.error(f"Background processing failed for user {user_id}, session {session_id}: {e}")
         db_manager.update_status(user_id, session_id, "failed", str(e))
-
+    finally:
+        # Clean up the task reference
+        background_tasks.pop(task_key, None)
 
 @app.post("/query")
-async def query_endpoint(request_data: QueryRequest, background_tasks: BackgroundTasks, token: str = Depends(verify_bearer_token)):
+async def query_endpoint(request_data: QueryRequest, token: str = Depends(verify_bearer_token)):
     try:
-        # Create database entry and get request ID
+        task_key = get_task_key(request_data.userId, request_data.sessionId)
+        
+        # Check if already processing
+        if task_key in background_tasks and not background_tasks[task_key].done():
+            return {
+                "message": "Brand analysis is already being processed for this session",
+                "userId": request_data.userId,
+                "sessionId": request_data.sessionId,
+                "status": "processing",
+                "statusEndpoint": f"/status/{request_data.userId}/{request_data.sessionId}"
+            }
+        
         request_id = db_manager.create_request(
             request_data.userId, 
             request_data.sessionId, 
             request_data.question
         )
         
-        # Add background task to process the analysis
-        background_tasks.add_task(
-            process_brand_analysis_background,
-            request_data.userId,
-            request_data.sessionId,
-            request_data.question
+        # Create background task using asyncio
+        task = asyncio.create_task(
+            process_brand_analysis_background(
+                request_data.userId,
+                request_data.sessionId,
+                request_data.question
+            )
         )
+        background_tasks[task_key] = task
         
-        # Return immediately with request details
+        # Return immediately
         return {
             "message": "Brand analysis request received and is being processed",
             "userId": request_data.userId,
@@ -275,12 +260,8 @@ async def query_endpoint(request_data: QueryRequest, background_tasks: Backgroun
         logger.error(f"Unhandled exception in query_endpoint: {e}")
         raise HTTPException(status_code=500, detail="Internal server error.")
 
-
 @app.get("/status/{user_id}/{session_id}")
 async def get_status(user_id: str, session_id: str, token: str = Depends(verify_bearer_token)):
-    """
-    Get the status of a brand analysis request
-    """
     try:
         status_data = db_manager.get_request_status(user_id, session_id)
         
@@ -295,11 +276,9 @@ async def get_status(user_id: str, session_id: str, token: str = Depends(verify_
             "updatedAt": status_data["updated_at"]
         }
         
-        # Include error message if failed
         if status_data["status"] == "failed" and status_data.get("error_message"):
             response["errorMessage"] = status_data["error_message"]
         
-        # Include results if completed
         if status_data["status"] == "completed" and status_data.get("results"):
             response["results"] = status_data["results"]
         
@@ -311,6 +290,15 @@ async def get_status(user_id: str, session_id: str, token: str = Depends(verify_
         logger.error(f"Error getting status for {user_id}/{session_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
+@app.get("/health")
+async def health_check():
+    active_tasks = sum(1 for task in background_tasks.values() if not task.done())
+    return {
+        "status": "healthy",
+        "active_background_tasks": active_tasks,
+        "total_background_tasks": len(background_tasks),
+        "timestamp": datetime.now().isoformat()
+    }
 
 if __name__ == "__main__":
     # Use the PORT environment variable provided by Cloud Run, defaulting to 8080
