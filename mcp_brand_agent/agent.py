@@ -52,10 +52,10 @@ class BrandSentimentReport(BaseModel):
 #     model="groq/qwen-qwq-32b",
 #     api_key=os.getenv("GROQ_API_KEY"),
 # )
-model_o4 = LiteLlm(
-    model="gpt-4.1",
-    api_key=os.getenv("OPENAI_API_KEY")
-)
+# model_o4 = LiteLlm(
+#     model="gpt-4.1",
+#     api_key=os.getenv("OPENAI_API_KEY")
+# )
 # model = 'gemini-2.5-flash-preview-04-17'
 
 # model_qwen = LiteLlm(
@@ -76,6 +76,7 @@ search_web = MCPToolset(
             )
 )
 
+model_o4 = "gemini-2.0-flash"
 model_gemini = "gemini-2.5-flash-preview-04-17"
 
 def exit_loop(tool_context: ToolContext):
