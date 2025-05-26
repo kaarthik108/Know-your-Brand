@@ -4,9 +4,7 @@ WORKDIR ${LAMBDA_TASK_ROOT}
 
 # Install Node.js and npm, and other system dependencies
 RUN yum update -y && \
-    yum install -y curl gcc libpq-devel && \
-    curl -fsSL https://rpm.nodesource.com/setup_lts.x | bash - && \
-    yum install -y nodejs && \
+    yum install -y curl gcc libpq-devel nodejs && \
     yum clean all && \
     rm -rf /var/cache/yum
 
