@@ -1,0 +1,75 @@
+name: Deploy to Lambda via ECR
+
+on:
+  push:
+    branches:
+      - main-aw
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: mcp-brand-agent
+  LAMBDA_FUNCTION_NAME: mcp-brand-agent-function
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+        
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+      
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build a docker container and push it to ECR
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+        
+    - name: Update Lambda function
+      env:
+        IMAGE_URI: ${{ steps.build-image.outputs.image }}
+      run: |
+        aws lambda update-function-code \
+          --function-name $LAMBDA_FUNCTION_NAME \
+          --image-uri $IMAGE_URI \
+          --region $AWS_REGION
+          
+    - name: Wait for Lambda function update to complete
+      run: |
+        aws lambda wait function-updated \
+          --function-name $LAMBDA_FUNCTION_NAME \
+          --region $AWS_REGION
+          
+    - name: Update Lambda environment variables
+      run: |
+        aws lambda update-function-configuration \
+          --function-name $LAMBDA_FUNCTION_NAME \
+          --environment Variables="{
+            GOOGLE_CLOUD_PROJECT=${{ secrets.GOOGLE_CLOUD_PROJECT }},
+            GOOGLE_CLOUD_LOCATION=${{ secrets.GOOGLE_CLOUD_LOCATION }},
+            GOOGLE_GENAI_USE_VERTEXAI=${{ secrets.GOOGLE_GENAI_USE_VERTEXAI }},
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }},
+            GROQ_API_KEY=${{ secrets.GROQ_API_KEY }},
+            MCP_TOKEN=${{ secrets.MCP_TOKEN }},
+            GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }},
+            SESSION_DB_URL=${{ secrets.SESSION_DB_URL }},
+            SUPABASE_URL=${{ secrets.SUPABASE_URL }},
+            SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }},
+            API_TOKEN=${{ secrets.API_TOKEN }}
+          }" \
+          --region $AWS_REGION 

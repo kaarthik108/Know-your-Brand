@@ -1,29 +1,26 @@
 import os
-import uvicorn
 import json
 import logging
 from typing import Any, Dict
-
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from mangum import Mangum
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService, DatabaseSessionService
 from google.genai import types
 
 from mcp_brand_agent.agent import root_agent
 from database import db_manager
-# Load environment variables
-load_dotenv('.env')
+
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 APP_NAME = os.environ.get("APP_NAME", "mcp_brand_agent")
-
 ALLOWED_ORIGINS = ["*"]
-
 SESSION_DB_URL = os.environ.get("SESSION_DB_URL")
 
 app = FastAPI()
@@ -38,17 +35,14 @@ app.add_middleware(
 def init_session_service() -> DatabaseSessionService:
     try:
         service = DatabaseSessionService(db_url=SESSION_DB_URL)
-
         if service is None:
             raise RuntimeError("DatabaseSessionService constructor returned None")
-
         print(f"DatabaseSessionService initialized successfully. Type: {type(service)}")
         return service
     except Exception as e:
         print(f"Failed to initialize DatabaseSessionService: {e}")
         print(f"Exception type: {type(e)}")
         raise RuntimeError(f"Failed to initialize DatabaseSessionService: {e}")
-
 
 try:
     session_service = init_session_service()
@@ -57,23 +51,9 @@ except Exception as e:
     print(f"CRITICAL: Failed to initialize global session_service: {e}")
     session_service = None
 
-# session_service = InMemorySessionService()
-
-
 async def run_agent_logic(
     user_id: str, session_id: str, question: str
 ) -> Dict[str, Any]:
-    """
-    Runs the agent logic asynchronously, using pre-updated session state.
-
-    Args:
-        user_id: Unique identifier for the user
-        session_id: Unique identifier for the session
-        question: The user's question or input
-
-    Returns:
-        Dictionary containing the agent's response
-    """
     try:
         agent = root_agent
     except Exception as e:
@@ -81,7 +61,6 @@ async def run_agent_logic(
         return {"answerText": "Error: Could not get static agent reference."}
 
     runner = Runner(agent=agent, app_name=APP_NAME, session_service=session_service)
-
     initial_content = types.Content(role="user", parts=[types.Part(text=question)])
     final_response = None
 
@@ -115,11 +94,7 @@ async def run_agent_logic(
 
     return final_response
 
-
 async def get_or_create_session(user_id: str, session_id: str) -> Any:
-    """
-    Retrieves an existing session or creates a new one if it doesn't exist.
-    """
     try:
         if session_service is None:
             print("ERROR: session_service is None!")
@@ -141,7 +116,6 @@ async def get_or_create_session(user_id: str, session_id: str) -> Any:
                 session_id=session_id,
             )
 
-        # Verify session was created properly
         if not current_session:
             raise RuntimeError(f"Failed to create session for user {user_id}, session {session_id}")
 
@@ -151,17 +125,14 @@ async def get_or_create_session(user_id: str, session_id: str) -> Any:
         print(f"Error during session lookup/creation for session {session_id}: {e}")
         raise
 
-
 class QueryRequest(BaseModel):
     userId: str
     sessionId: str
     question: str
 
-
 @app.post("/query")
 async def query_endpoint(request_data: QueryRequest):
     try:
-        # Check if analysis already exists
         existing_request = db_manager.get_existing_request(
             request_data.userId, 
             request_data.sessionId
@@ -173,37 +144,31 @@ async def query_endpoint(request_data: QueryRequest):
             elif existing_request['status'] in ['pending', 'running']:
                 return {"message": "Analysis already in progress"}
         
-        # Create database entry with 'pending' status
         db_manager.create_request(
             request_data.userId, 
             request_data.sessionId, 
             request_data.question
         )
         
-        # Update status to 'running' when analysis starts
         db_manager.update_status(request_data.userId, request_data.sessionId, "running")
         
-        # Get or create session FIRST
         await get_or_create_session(
             request_data.userId,
             request_data.sessionId
         )
 
-        # Run the agent logic BEFORE accessing session state
         await run_agent_logic(
             request_data.userId,
             request_data.sessionId,
             request_data.question
         )
 
-        # NOW get updated session after agent execution
         updated_session = await session_service.get_session(
             app_name=APP_NAME,
             user_id=request_data.userId,
             session_id=request_data.sessionId,
         )
 
-        # Check if session exists and has state
         if not updated_session or not hasattr(updated_session, 'state') or not updated_session.state:
             raise ValueError("Session state is empty after agent execution")
 
@@ -212,7 +177,6 @@ async def query_endpoint(request_data: QueryRequest):
         analysis_results_reddit = updated_session.state.get("final_reddit_results", {})
         analysis_results_news = updated_session.state.get("final_news_results", {})
 
-        # Parse JSON strings if needed
         def parse_result(result_data):
             if isinstance(result_data, str):
                 try:
@@ -235,7 +199,6 @@ async def query_endpoint(request_data: QueryRequest):
             "analysis_results_news": analysis_results_news
         }
 
-        # Update status to 'completed' when done
         db_manager.update_status(request_data.userId, request_data.sessionId, "completed")
         db_manager.save_results(request_data.userId, request_data.sessionId, response_data)
 
@@ -249,9 +212,8 @@ async def query_endpoint(request_data: QueryRequest):
         db_manager.update_status(request_data.userId, request_data.sessionId, "failed", "Internal server error.")
         raise HTTPException(status_code=500, detail="Internal server error.")
 
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
 
-if __name__ == "__main__":
-    # Use the PORT environment variable provided by Cloud Run, defaulting to 8080
-    port = int(os.environ.get("PORT", 8080))
-    print(f"Starting server on http://0.0.0.0:{port}")
-    uvicorn.run(app, host="0.0.0.0", port=port)
+handler = Mangum(app)

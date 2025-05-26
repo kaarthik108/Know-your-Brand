@@ -10,3 +10,4 @@ requests
 supabase
 langchain-mcp-adapters==0.1.1
 langchain-community==0.3.24
+mangum
