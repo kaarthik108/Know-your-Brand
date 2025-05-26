@@ -51,20 +51,15 @@ class BrandSentimentReport(BaseModel):
 #     model="groq/qwen-qwq-32b",
 #     api_key=os.getenv("GROQ_API_KEY"),
 # )
-model_o4 = model_gemini = LiteLlm(
+model_extract = model_analysis = LiteLlm(
     model="o4-mini",
     api_key=os.getenv("OPENAI_API_KEY")
 )
-# model = 'gemini-2.5-flash-preview-04-17'
-
 # model_qwen = LiteLlm(
 #     model="together_ai/Qwen/Qwen2.5-72B-Instruct-Turbo",
 #     api_key=os.getenv("TOGETHERAI_API_KEY"),
 #     # max_tokens=93762
 # )
-
-# model_o4 = "gemini-2.0-flash"
-# model_o4 = "gemini-2.5-flash-preview-04-17"
 
 def exit_loop(tool_context: ToolContext):
   """Call this function ONLY when the critique indicates no further changes are needed, signaling the iterative process should end."""
@@ -76,13 +71,13 @@ def exit_loop(tool_context: ToolContext):
 
 # Create platform-specific search agents
 twitter_agent = LlmAgent(
-    model=model_o4,
+    model=model_analysis,
     name='twitter_agent',
     description="Searches Twitter/X for brand mentions and provides analysis",
     instruction="""
 Search for exactly 3 Twitter/X posts about the brand, then analyze and return structured data.
 
-First, search using brand name, hashtags, and keywords from x.com domain only.
+First, search using brand name, hashtags, and keywords from x.com domain only, Extract 10+ significant words for word_cloud_themes_on_platform.
 
 Then analyze the posts and return this JSON structure:
 {
@@ -112,7 +107,7 @@ Then analyze the posts and return this JSON structure:
   ]
 }
 
-Extract 10+ significant words for word_cloud_themes_on_platform. Return only valid JSON.
+ Return only valid JSON.
     """,
     tools=[search_web],
     # output_schema=SinglePlatformAnalysisReport,
@@ -120,7 +115,7 @@ Extract 10+ significant words for word_cloud_themes_on_platform. Return only val
 )
 
 twitter_extract_agent = LlmAgent(
-    model=model_gemini,
+    model=model_extract,
     name='twitter_extract_agent',
     description="Extracts the results from the twitter_agent in the structured JSON format",
     instruction="""
@@ -148,7 +143,7 @@ twitter_sequential_agent = SequentialAgent(
 # )
 
 linkedin_agent = LlmAgent(
-    model=model_o4,
+    model=model_analysis,
     name='linkedin_agent',
     description="Searches LinkedIn for brand mentions and provides analysis",
     instruction="""
@@ -192,7 +187,7 @@ Extract 10+ significant words for word_cloud_themes_on_platform. Return only val
 )
 
 linkedin_extract_agent = LlmAgent(
-    model=model_gemini,
+    model=model_extract,
     name='linkedin_extract_agent',
     description="Extracts the results from the linkedin_agent in the structured JSON format",
     instruction="""
@@ -220,7 +215,7 @@ linkedin_sequential_agent = SequentialAgent(
 # )
 
 reddit_agent = LlmAgent(
-    model=model_o4,
+    model=model_analysis,
     name='reddit_agent',
     description="Searches Reddit for brand mentions and provides analysis",
     instruction="""
@@ -265,7 +260,7 @@ Extract 10+ significant words for word_cloud_themes_on_platform. Return only val
 
 reddit_extract_agent = LlmAgent(
     name='reddit_extract_agent',
-    model=model_gemini,
+    model=model_extract,
     description="Extracts the results from the reddit_agent in the structured JSON format",
     instruction="""
     Extract the results from the reddit_agent and return the results in the structured JSON format: 
@@ -293,7 +288,7 @@ reddit_sequential_agent = SequentialAgent(
 # )
 
 news_agent = LlmAgent(
-    model=model_o4,
+    model=model_analysis,
     name='news_agent',
     description="Searches news sites for brand mentions and provides analysis",
     instruction="""
@@ -338,7 +333,7 @@ Extract 10+ significant words for word_cloud_themes_on_platform. Return only val
 
 news_extract_agent = LlmAgent(
     name='news_extract_agent',
-    model=model_gemini,
+    model=model_extract,
     description="Extracts the results from the news_agent in the structured JSON format",
     instruction="""
     Extract the results from the news_agent and return the results in the structured JSON format: 
