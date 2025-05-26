@@ -2,8 +2,11 @@ import os
 import dotenv
 import asyncio
 
-from google.adk.tools.langchain_tool import LangchainTool
-from langchain_mcp_adapters.client import MultiServerMCPClient
+from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParameters
+
+
+# from google.adk.tools.langchain_tool import LangchainTool
+# from langchain_mcp_adapters.client import MultiServerMCPClient
 
 dotenv.load_dotenv('.env')
 
@@ -62,60 +65,13 @@ dotenv.load_dotenv('.env')
 # search_web.__name__ = "search_web"
 # search_web.__doc__ = "Search the web for information based on the provided query."
 
-# search_web = MCPToolset(
-#     connection_params=StdioServerParameters(
-#         command="npx", 
-#         args=["-y", "@brightdata/mcp"],
-#         env={
-#             "API_TOKEN": os.getenv("MCP_TOKEN"),
-#             "WEB_UNLOCKER_ZONE": "web_unlocker1",
-#         }
-#     ),
-# )
-client = MultiServerMCPClient(
-    {
-        "web_search": {
-            "command": "npx",
-            "args": ["-y", "@brightdata/mcp"],
-            "transport": "stdio",
-            "env": {
-                "API_TOKEN": os.getenv("MCP_TOKEN"),
-                "WEB_UNLOCKER_ZONE": "web_unlocker1",
-            }
+search_web = MCPToolset(
+    connection_params=StdioServerParameters(
+        command="npx", 
+        args=["-y", "@brightdata/mcp"],
+        env={
+            "API_TOKEN": os.getenv("MCP_TOKEN"),
+            "WEB_UNLOCKER_ZONE": "web_unlocker1",
         }
-    }
+    ),
 )
-
-async def get_search_tools():
-    """Get the MCP tools asynchronously"""
-    tools = await client.get_tools()
-    return tools
-
-def create_search_web_tool():
-    """Create a search web tool synchronously by running the async function"""
-    try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-    
-    tools = loop.run_until_complete(get_search_tools())
-    
-    # Find the web search tool from the available tools
-    web_search_tool = None
-    for tool in tools:
-        if hasattr(tool, 'name') and 'search' in tool.name.lower():
-            web_search_tool = tool
-            break
-    
-    if web_search_tool is None and tools:
-        # If no specific search tool found, use the first available tool
-        web_search_tool = tools[0]
-    
-    if web_search_tool:
-        return LangchainTool(tool=web_search_tool)
-    else:
-        raise ValueError("No web search tool found in MCP server")
-
-# Create the search_web tool
-search_web = create_search_web_tool()
