@@ -38,17 +38,11 @@ app.add_middleware(
 def init_session_service() -> DatabaseSessionService:
     try:
         service = DatabaseSessionService(db_url=SESSION_DB_URL)
-
-        if service is None:
-            raise RuntimeError("DatabaseSessionService constructor returned None")
-
-        print(f"DatabaseSessionService initialized successfully. Type: {type(service)}")
+        print(f"DatabaseSessionService initialized with URL: {SESSION_DB_URL}")
         return service
     except Exception as e:
-        print(f"Failed to initialize DatabaseSessionService: {e}")
-        print(f"Exception type: {type(e)}")
-        raise RuntimeError(f"Failed to initialize DatabaseSessionService: {e}")
-
+        print(f"Failed to initialize ADK components: {e}")
+        raise RuntimeError(f"Failed to initialize ADK components: {e}")
 
 try:
     session_service = init_session_service()
@@ -127,7 +121,7 @@ async def get_or_create_session(user_id: str, session_id: str) -> Any:
 
         print(f"DEBUG: Attempting to get session for user_id={user_id}, session_id={session_id}")
 
-        current_session = await session_service.get_session(
+        current_session = session_service.get_session(
             app_name=APP_NAME,
             user_id=user_id,
             session_id=session_id,
@@ -135,7 +129,7 @@ async def get_or_create_session(user_id: str, session_id: str) -> Any:
 
         if not current_session:
             print(f"Session not found for user {user_id}, session {session_id}. Creating new session.")
-            current_session = await session_service.create_session(
+            current_session = session_service.create_session(
                 app_name=APP_NAME,
                 user_id=user_id,
                 session_id=session_id,
@@ -197,7 +191,7 @@ async def query_endpoint(request_data: QueryRequest):
         )
 
         # NOW get updated session after agent execution
-        updated_session = await session_service.get_session(
+        updated_session = session_service.get_session(
             app_name=APP_NAME,
             user_id=request_data.userId,
             session_id=request_data.sessionId,
