@@ -160,7 +160,7 @@ async def query_endpoint(request_data: QueryRequest):
             request_data.question
         )
 
-        updated_session = await session_service.get_session(
+        updated_session = session_service.get_session(
             app_name=APP_NAME,
             user_id=request_data.userId,
             session_id=request_data.sessionId,
