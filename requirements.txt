@@ -5,6 +5,7 @@ litellm
 fastapi
 uvicorn
 psycopg2-binary
+SQLAlchemy
 requests
 supabase
 langchain-mcp-adapters==0.1.1
