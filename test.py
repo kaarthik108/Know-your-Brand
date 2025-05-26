@@ -577,3 +577,348 @@
 # root_agent = main_agent
 
 # fdc65bf3-6ccb-4ef4-b724-5833c9977716
+
+
+test = {
+	"userId": "user2",
+	"sessionId": "test-session-11",
+	"analysis_results_twitter": {
+		"brand_name": "Tesla",
+		"platform_name": "Twitter",
+		"total_mentions_on_platform": 3,
+		"platform_sentiment_breakdown": {
+			"positive": 0.6667,
+			"negative": 0,
+			"neutral": 0.3333
+		},
+		"ethical_highlights_on_platform": [
+			"Regulatory impact on technology innovation and safety concerns around autonomous vehicles.",
+			"Public expectations and media scrutiny of autonomous technology launches.",
+			"Federal support for innovation and regulatory harmonization in self-driving technology."
+		],
+		"word_cloud_themes_on_platform": [
+			{
+				"word": "autonomous",
+				"weight": 8
+			},
+			{
+				"word": "vehicles",
+				"weight": 8
+			},
+			{
+				"word": "regulatory",
+				"weight": 7
+			},
+			{
+				"word": "technology",
+				"weight": 8
+			},
+			{
+				"word": "innovation",
+				"weight": 6
+			},
+			{
+				"word": "safety",
+				"weight": 5
+			},
+			{
+				"word": "Tesla",
+				"weight": 10
+			},
+			{
+				"word": "robotaxi",
+				"weight": 6
+			},
+			{
+				"word": "approval",
+				"weight": 4
+			},
+			{
+				"word": "launch",
+				"weight": 4
+			},
+			{
+				"word": "nation-wide",
+				"weight": 4
+			},
+			{
+				"word": "support",
+				"weight": 3
+			},
+			{
+				"word": "automakers",
+				"weight": 3
+			}
+		],
+		"mentions_on_platform": [
+			{
+				"date": "2025-04-25",
+				"text": "The Trump administration is loosening regulations to support U.S. automakers like Tesla in developing self-driving cars. The United States ...",
+				"sentiment": "positive",
+				"ethical_context": "Regulatory impact on technology innovation and safety concerns around autonomous vehicles.",
+				"url": "https://x.com/Teslarati/status/1915729844157235232"
+			},
+			{
+				"date": "2025-05-19",
+				"text": "Tesla Robotaxi is among the biggest tech developments of the year, and its June launch date has not yet arrived. This does not matter to ...",
+				"sentiment": "neutral",
+				"ethical_context": "Public expectations and media scrutiny of autonomous technology launches.",
+				"url": "https://x.com/Teslarati/status/1924553082924417438"
+			},
+			{
+				"date": "2025-04-24",
+				"text": "The second win for Tesla is the announcement that the US will move to a nation-wide approval process for Autonomous Vehicles. Tesla has been ...",
+				"sentiment": "positive",
+				"ethical_context": "Federal support for innovation and regulatory harmonization in self-driving technology.",
+				"url": "https://x.com/techAU/status/1915531534242910386"
+			}
+		]
+	},
+	"analysis_results_linkedin": {
+		"brand_name": "Tesla",
+		"platform_name": "LinkedIn",
+		"total_mentions_on_platform": 3,
+		"platform_sentiment_breakdown": {
+			"positive": 1,
+			"negative": 0,
+			"neutral": 0
+		},
+		"ethical_highlights_on_platform": [
+			"Sustainability and innovation in clean energy technology",
+			"AI safety and responsible technology deployment"
+		],
+		"word_cloud_themes_on_platform": [
+			{
+				"word": "innovation",
+				"weight": 10
+			},
+			{
+				"word": "battery",
+				"weight": 8
+			},
+			{
+				"word": "AI",
+				"weight": 7
+			},
+			{
+				"word": "technology",
+				"weight": 7
+			},
+			{
+				"word": "production",
+				"weight": 6
+			},
+			{
+				"word": "vehicle",
+				"weight": 7
+			},
+			{
+				"word": "autonomous",
+				"weight": 5
+			},
+			{
+				"word": "energy",
+				"weight": 6
+			},
+			{
+				"word": "strategy",
+				"weight": 5
+			},
+			{
+				"word": "sustainability",
+				"weight": 6
+			}
+		],
+		"mentions_on_platform": [
+			{
+				"date": "2025-05-06",
+				"text": "Recent reports from international news outlets indicate that Tesla is significantly accelerating its most ambitious battery initiative in its 21-year history. Sources familiar with the matter suggest the electric vehicle pioneer aims to introduce four entirely new versions of its 4680 battery cell in the year 2026. These advanced power units are reportedly slated to power a range of upcoming Tesla vehicles, including the highly anticipated electric truck Cybertruck and the fully autonomous ride-hailing vehicle Robotaxi, as well as other electric car models. This endeavor represents Tesla's largest simultaneous battery development project to date. ... Timeline: Tesla plans to achieve mass production of these new batteries by the second quarter of 2025, with the full launch of all four cell types slated for 2026.",
+				"sentiment": "positive",
+				"ethical_context": "Sustainability, innovation in clean energy technology, corporate transparency",
+				"url": "https://www.linkedin.com/pulse/tesla-intensifies-efforts-groundbreaking-battery-project-singal-2jr3c"
+			},
+			{
+				"date": "2023-04-19",
+				"text": "Artificial Intelligence (AI) is increasingly being utilized in the automotive industry to enhance safety, convenience, and efficiency. One of the pioneers of this trend is Tesla, the electric vehicle company founded by Elon Musk. Tesla has been integrating AI into its cars since its inception and has developed some of the most advanced AI-powered features in the automotive market. The importance of AI in the automotive industry cannot be overstated. With the increasing demand for electric and autonomous vehicles, AI is becoming a key enabler of these technologies. AI-powered features, such as Tesla's Autopilot, have the potential to reduce accidents, enhance the driving experience, and improve energy efficiency.",
+				"sentiment": "positive",
+				"ethical_context": "AI safety, automotive ethics, consumer benefit, responsible technology deployment",
+				"url": "https://www.linkedin.com/pulse/teslas-use-ai-revolutionary-approach-car-technology-alexander-stahl"
+			},
+			{
+				"date": "2024-01-01",
+				"text": "This article analyzes the innovation process in Tesla Inc.'s business strategy. Tesla manages its mainstream and newstream innovation process effectively. In addition, the company sought to establish several strategic partnerships to accelerate its technological advancement process. ... Tesla's speed of innovation in the high-end vehicle market makes it more like a Google or an Amazon than an automaker. And its growing market valuation is a clear signal to all car manufacturers that they must develop more innovative business models like Tesla to survive. ... Tesla provides customers with free charging stations, known as Superchargers, throughout the United States and Europe. The company's strategy of building colossal factories, called Gigafactories, has allowed them to increase battery and vehicle production.",
+				"sentiment": "positive",
+				"ethical_context": "Corporate innovation, competitive dynamics, strategic partnerships, sustainable development",
+				"url": "https://www.linkedin.com/pulse/innovation-process-tesla-inc-sandro-saboia-11ybf"
+			}
+		]
+	},
+	"analysis_results_reddit": {
+		"brand_name": "Tesla",
+		"platform_name": "Reddit",
+		"total_mentions_on_platform": 3,
+		"platform_sentiment_breakdown": {
+			"positive": 0,
+			"negative": 1,
+			"neutral": 0
+		},
+		"ethical_highlights_on_platform": [
+			"Consumer trust and safety concerns",
+			"Impact of leadership/politics on brand perception",
+			"Product quality and technological innovation compared to competitors",
+			"Perceived stagnation in technology"
+		],
+		"word_cloud_themes_on_platform": [
+			{
+				"word": "Tesla",
+				"weight": 10
+			},
+			{
+				"word": "Tech",
+				"weight": 10
+			},
+			{
+				"word": "Technology",
+				"weight": 9
+			},
+			{
+				"word": "Elon",
+				"weight": 8
+			},
+			{
+				"word": "Americans",
+				"weight": 7
+			},
+			{
+				"word": "Safety",
+				"weight": 8
+			},
+			{
+				"word": "Quality",
+				"weight": 8
+			},
+			{
+				"word": "Politics",
+				"weight": 7
+			},
+			{
+				"word": "Advantage",
+				"weight": 6
+			},
+			{
+				"word": "Bad",
+				"weight": 7
+			},
+			{
+				"word": "Consumers",
+				"weight": 6
+			},
+			{
+				"word": "Rivals",
+				"weight": 6
+			}
+		],
+		"mentions_on_platform": [
+			{
+				"date": "Recent",
+				"text": "25% of Americans Avoiding Tesla Tech Because of Elon. Americans are avoiding Tesla technology for safety and quality control reasons. Musk's politics may also be alienating some consumers.",
+				"sentiment": "negative",
+				"ethical_context": "Consumer trust, safety, and the impact of leadership on brand perception.",
+				"url": "https://www.reddit.com/r/RealTesla/comments/1hyn3o1/25%5Fof%5Famericans%5Favoiding%5Ftesla%5Ftech%5Fbecause%5Fof/"
+			},
+			{
+				"date": "2 years ago",
+				"text": "Where does Tesla's tech advantage sit these days? It seems that Teslas actually have pretty bad tech for a modern car. No sensors, no 360 camera, no CarPlay/AA (debatable, I prefer Teslas UI...",
+				"sentiment": "negative",
+				"ethical_context": "Product quality and technological innovation compared to competitors.",
+				"url": "https://www.reddit.com/r/TeslaModelY/comments/1399rh9/where%5Fdoes%5Fteslas%5Ftech%5Fadvantage%5Fsit%5Fthese%5Fdays/"
+			},
+			{
+				"date": "Recent",
+				"text": "Sorry Elon, most Americans are uneasy with this Tesla... The only good tech in Teslas are the battery packs and the engines, and those are thanks to the original founders. Rivals have caught up on both...",
+				"sentiment": "negative",
+				"ethical_context": "Technological innovation, market competition, and perceived stagnation.",
+				"url": "https://www.reddit.com/r/RealTesla/comments/1j5mzyh/sorry%5Felon%5Fmost%5Famericans%5Fare%5Funeasy%5Fwith%5Fthis/"
+			}
+		]
+	},
+	"analysis_results_news": {
+		"brand_name": "Tesla",
+		"platform_name": "News",
+		"total_mentions_on_platform": 3,
+		"platform_sentiment_breakdown": {
+			"positive": 0.6667,
+			"negative": 0.3333,
+			"neutral": 0
+		},
+		"ethical_highlights_on_platform": [
+			"Innovation ethics, responsible investing, and the societal impact of autonomous technology rollouts.",
+			"Data privacy and regulatory compliance relating to artificial intelligence applications."
+		],
+		"word_cloud_themes_on_platform": [
+			{
+				"word": "robotaxis",
+				"weight": 8
+			},
+			{
+				"word": "autonomous",
+				"weight": 7
+			},
+			{
+				"word": "technology",
+				"weight": 7
+			},
+			{
+				"word": "investors",
+				"weight": 5
+			},
+			{
+				"word": "Austin",
+				"weight": 5
+			},
+			{
+				"word": "vehicles",
+				"weight": 4
+			},
+			{
+				"word": "Musk",
+				"weight": 8
+			},
+			{
+				"word": "compliance",
+				"weight": 5
+			},
+			{
+				"word": "privacy",
+				"weight": 5
+			},
+			{
+				"word": "self-driving",
+				"weight": 6
+			}
+		],
+		"mentions_on_platform": [
+			{
+				"date": "2025-05-23",
+				"text": "Tesla will have 'robotaxis' on the streets of Austin, Texas, by the end of June, CEO Elon Musk told CNBC. The program will start with about 10 self-driving vehicles and rapidly expand to thousands if the launch goes off without incident. Financial experts advise investors to assess risk and perform due diligence before investing in disruptive technologies like autonomous vehicles.",
+				"sentiment": "positive",
+				"ethical_context": "Innovation ethics, responsible investing, and the societal impact of autonomous technology rollouts.",
+				"url": "https://www.cnbc.com/2025/05/23/musk-promises-tesla-robotaxis-what-to-know-about-investing-in-futuristic-tech.html"
+			},
+			{
+				"date": "2025-05-24",
+				"text": "Tesla stock has risen over the past month, riding momentum for a major event: the rollout of autonomous robotaxis in Austin, Texas. Wedbush Securities analyst Daniel Ives has raised his price target for Tesla, citing a 'golden age' of autonomous driving technology. He acknowledges that previous controversies involving CEO Elon Musk affected Tesla's brand but says a recommitted Musk is once again leading Tesla into the future.",
+				"sentiment": "positive",
+				"ethical_context": "Leadership accountability, brand reputation, and technological evolution in public transportation.",
+				"url": "https://www.thestreet.com/technology/analyst-sets-eye-popping-tesla-stock-price-target"
+			},
+			{
+				"date": "Recent",
+				"text": "Reuters says Musk's AI chatbot sifted federal data without DHS approval.",
+				"sentiment": "negative",
+				"ethical_context": "Data privacy and regulatory compliance relating to artificial intelligence applications.",
+				"url": "https://finance.yahoo.com/news/tesla-slides-grok-rolls-federal-160347875.html"
+			}
+		]
+	}
+}

@@ -116,29 +116,16 @@ async def run_agent_logic(
     return final_response
 
 
-async def get_or_create_session(
-    user_id: str, session_id: str
-) -> Any:
+async def get_or_create_session(user_id: str, session_id: str) -> Any:
     """
     Retrieves an existing session or creates a new one if it doesn't exist.
-
-    Args:
-        user_id: Unique identifier for the user
-        session_id: Unique identifier for the session
-
-    Returns:
-        Session object
     """
     try:
-        # Debug: Check if session_service is None
         if session_service is None:
             print("ERROR: session_service is None!")
             raise RuntimeError("Session service not initialized")
 
-        print(f"DEBUG: session_service type: {type(session_service)}")
-        print(
-            f"DEBUG: Attempting to get session for user_id={user_id}, session_id={session_id}"
-        )
+        print(f"DEBUG: Attempting to get session for user_id={user_id}, session_id={session_id}")
 
         current_session = await session_service.get_session(
             app_name=APP_NAME,
@@ -147,15 +134,16 @@ async def get_or_create_session(
         )
 
         if not current_session:
-            print(
-                f"Session not found for user {user_id}, session {session_id}. Creating new session."
-            )
-
+            print(f"Session not found for user {user_id}, session {session_id}. Creating new session.")
             current_session = await session_service.create_session(
                 app_name=APP_NAME,
                 user_id=user_id,
                 session_id=session_id,
             )
+
+        # Verify session was created properly
+        if not current_session:
+            raise RuntimeError(f"Failed to create session for user {user_id}, session {session_id}")
 
         return current_session
 
@@ -173,32 +161,51 @@ class QueryRequest(BaseModel):
 @app.post("/query")
 async def query_endpoint(request_data: QueryRequest):
     try:
-        # Create database entry and get request ID
+        # Check if analysis already exists
+        existing_request = db_manager.get_existing_request(
+            request_data.userId, 
+            request_data.sessionId
+        )
+        
+        if existing_request:
+            if existing_request['status'] == 'completed':
+                return existing_request['results']
+            elif existing_request['status'] in ['pending', 'running']:
+                return {"message": "Analysis already in progress"}
+        
+        # Create database entry with 'pending' status
         db_manager.create_request(
             request_data.userId, 
             request_data.sessionId, 
             request_data.question
         )
         
-        # Get or create session
+        # Update status to 'running' when analysis starts
+        db_manager.update_status(request_data.userId, request_data.sessionId, "running")
+        
+        # Get or create session FIRST
         await get_or_create_session(
             request_data.userId,
             request_data.sessionId
         )
 
-        # Run the agent logic
+        # Run the agent logic BEFORE accessing session state
         await run_agent_logic(
             request_data.userId,
             request_data.sessionId,
             request_data.question
         )
 
-        # Get updated session after agent execution
+        # NOW get updated session after agent execution
         updated_session = await session_service.get_session(
             app_name=APP_NAME,
             user_id=request_data.userId,
             session_id=request_data.sessionId,
         )
+
+        # Check if session exists and has state
+        if not updated_session or not hasattr(updated_session, 'state') or not updated_session.state:
+            raise ValueError("Session state is empty after agent execution")
 
         analysis_results_twitter = updated_session.state.get("final_twitter_results", {})
         analysis_results_linkedin = updated_session.state.get("final_linkedin_results", {})
@@ -228,6 +235,8 @@ async def query_endpoint(request_data: QueryRequest):
             "analysis_results_news": analysis_results_news
         }
 
+        # Update status to 'completed' when done
+        db_manager.update_status(request_data.userId, request_data.sessionId, "completed")
         db_manager.save_results(request_data.userId, request_data.sessionId, response_data)
 
         return response_data

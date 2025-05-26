@@ -56,9 +56,9 @@ class DatabaseManager:
             
             if existing.data:
                 # Update existing record
-                response = self.supabase.table(self.table_name).update({
+                self.supabase.table(self.table_name).update({
                     "question": question,
-                    "status": "running",
+                    "status": "pending",  # Changed from "running" to "pending"
                     "updated_at": datetime.utcnow().isoformat(),
                     "error_message": None,
                     "results": None
@@ -67,12 +67,12 @@ class DatabaseManager:
                 return existing.data[0]["id"]
             else:
                 # Insert new record
-                response = self.supabase.table(self.table_name).insert({
+                self.supabase.table(self.table_name).insert({
                     "id": request_id,
                     "user_id": user_id,
                     "session_id": session_id,
                     "question": question,
-                    "status": "running"
+                    "status": "pending"  # Changed from "running" to "pending"
                 }).execute()
                 
                 return request_id
@@ -80,23 +80,30 @@ class DatabaseManager:
         except Exception as e:
             print(f"Error creating request: {e}")
             raise
-    
+
+    def get_existing_request(self, user_id: str, session_id: str):
+        """Get existing request by user_id and session_id"""
+        try:
+            response = self.supabase.table(self.table_name).select("*").eq("user_id", user_id).eq("session_id", session_id).execute()
+            
+            if response.data:
+                return response.data[0]
+            return None
+            
+        except Exception as e:
+            print(f"Error getting existing request: {e}")
+            return None
+        
     def update_status(self, user_id: str, session_id: str, status: str, error_message: str = None):
         """Update the status of a request"""
         try:
-            update_data = {
+            self.supabase.table(self.table_name).update({
                 "status": status,
+                "error_message": error_message,
                 "updated_at": datetime.utcnow().isoformat()
-            }
-            
-            if error_message:
-                update_data["error_message"] = error_message
-            
-            response = self.supabase.table(self.table_name).update(update_data).eq("user_id", user_id).eq("session_id", session_id).execute()
-            
+            }).eq("user_id", user_id).eq("session_id", session_id).execute()
         except Exception as e:
             print(f"Error updating status: {e}")
-            raise
     
     def save_results(self, user_id: str, session_id: str, results: Dict[str, Any]):
         """Save the analysis results and mark as completed"""

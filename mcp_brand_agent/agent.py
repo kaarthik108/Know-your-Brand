@@ -51,10 +51,10 @@ class BrandSentimentReport(BaseModel):
 #     model="groq/qwen-qwq-32b",
 #     api_key=os.getenv("GROQ_API_KEY"),
 # )
-# model_o4 = LiteLlm(
-#     model="gpt-4.1",
-#     api_key=os.getenv("OPENAI_API_KEY")
-# )
+model_o4 = model_gemini = LiteLlm(
+    model="o4-mini",
+    api_key=os.getenv("OPENAI_API_KEY")
+)
 # model = 'gemini-2.5-flash-preview-04-17'
 
 # model_qwen = LiteLlm(
@@ -63,8 +63,8 @@ class BrandSentimentReport(BaseModel):
 #     # max_tokens=93762
 # )
 
-model_o4 = "gemini-2.0-flash"
-model_gemini = "gemini-2.5-flash-preview-04-17"
+# model_o4 = "gemini-2.0-flash"
+# model_o4 = "gemini-2.5-flash-preview-04-17"
 
 def exit_loop(tool_context: ToolContext):
   """Call this function ONLY when the critique indicates no further changes are needed, signaling the iterative process should end."""
