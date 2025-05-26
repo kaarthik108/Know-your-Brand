@@ -1,7 +1,6 @@
 google-adk
 python-dotenv
 pydantic
-asyncio
 litellm
 fastapi
 uvicorn

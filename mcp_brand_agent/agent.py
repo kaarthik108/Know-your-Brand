@@ -1,5 +1,4 @@
 import os
-import asyncio
 from google.adk.agents import LlmAgent, ParallelAgent, LoopAgent, SequentialAgent
 from pydantic import BaseModel
 from typing import List, Dict, Literal
