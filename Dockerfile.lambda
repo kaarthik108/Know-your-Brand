@@ -8,7 +8,6 @@ ENV PYTHONUNBUFFERED=1
 ENV AWS_LWA_INVOKE_MODE=response_stream
 ENV UV_CACHE_DIR=/tmp/.uv-cache
 ENV UV_NO_CACHE=1
-ENV SESSION_DB_URL=""
 
 COPY requirements.txt /app/requirements.txt
 
