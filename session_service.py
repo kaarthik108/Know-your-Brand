@@ -2,8 +2,10 @@ import os
 from typing import Optional
 from google.adk.sessions import DatabaseSessionService, Session
 import logging
-logger = logging.getLogger(__name__)
+from dotenv import load_dotenv
 
+logger = logging.getLogger(__name__)
+load_dotenv('.env')
 APP_NAME = os.environ.get("APP_NAME", "mcp_brand_agent")
 class AsyncSessionService:
     """Async wrapper for ADK session service"""
@@ -15,6 +17,7 @@ class AsyncSessionService:
         """Get or create session service instance"""
         if self._session_service is None:
             try:
+                logger.info(f"Initializing DatabaseSessionService with URL: {os.getenv('SESSION_DB_URL')}")
                 self._session_service = DatabaseSessionService(db_url=os.getenv("SESSION_DB_URL"))
                 logger.info("DatabaseSessionService initialized successfully")
             except Exception as e:
