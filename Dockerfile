@@ -21,15 +21,9 @@ RUN apt-get update && \
 COPY requirements.txt .
 RUN uv pip install --system -r requirements.txt
 
-RUN adduser --disabled-password --gecos "" myuser && \
-    chown -R myuser:myuser /app
+ADD . /app
+ENV PATH="/app/.venv/bin:$PATH"
 
-COPY . .
-
-USER myuser
-
-ENV PATH="/home/myuser/.local/bin:$PATH"
 EXPOSE 8080
-
 
 CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
