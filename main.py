@@ -222,29 +222,16 @@ async def query_endpoint(request_data: QueryRequest):
 
         # Run the agent logic BEFORE accessing session state
         try:
-            # Add timeout to prevent hanging on MCP initialization
-            agent_response = await asyncio.wait_for(
-                run_agent_logic(
+            agent_response = await run_agent_logic(
                     request_data.userId,
                     request_data.sessionId,
                     request_data.question
-                ),
-                timeout=300  # 5 minutes timeout
-            )
+                )
             logger.info(f"Agent response: {agent_response}")
-        except asyncio.TimeoutError:
-            logger.error(f"Agent execution timed out for session {request_data.sessionId}")
-            db_manager.update_status(request_data.userId, request_data.sessionId, "failed", "Agent execution timed out")
-            raise HTTPException(status_code=504, detail="Request timed out")
         except Exception as agent_error:
             logger.error(f"Agent execution failed: {agent_error}")
-            # If it's an MCP initialization error, mark as failed and return error
-            if "mcp" in str(agent_error).lower() or "session" in str(agent_error).lower():
-                db_manager.update_status(request_data.userId, request_data.sessionId, "failed", f"MCP initialization failed: {str(agent_error)}")
-                raise HTTPException(status_code=503, detail="Service temporarily unavailable. MCP tools are not accessible.")
-            else:
-                db_manager.update_status(request_data.userId, request_data.sessionId, "failed", str(agent_error))
-                raise HTTPException(status_code=500, detail="Agent execution failed")
+            db_manager.update_status(request_data.userId, request_data.sessionId, "failed", str(agent_error))
+            raise HTTPException(status_code=500, detail="Agent execution failed")
 
         # NOW get updated session after agent execution
         updated_session = await session_service.get_session(
@@ -260,11 +247,10 @@ async def query_endpoint(request_data: QueryRequest):
             logger.error(f"Session not found after agent execution for user {request_data.userId}, session {request_data.sessionId}")
             raise ValueError("Session not found after agent execution")
         
-        if not hasattr(updated_session, 'state') or not updated_session.state:
+        if not updated_session.state:
             logger.error(f"Session state is empty after agent execution. Session: {updated_session}")
             logger.error(f"Session type: {type(updated_session)}")
-            if hasattr(updated_session, 'state'):
-                logger.error(f"Session state: {updated_session.state}")
+            logger.error(f"Session state: {updated_session.state}")
             raise ValueError("Session state is empty after agent execution")
 
         logger.info(f"Session state keys: {list(updated_session.state.keys()) if updated_session.state else 'No state'}")
