@@ -25,13 +25,11 @@ APP_NAME = os.environ.get("APP_NAME", "mcp_brand_agent")
 
 ALLOWED_ORIGINS = ["*"]
 
-SESSION_DB_URL = os.environ.get("SESSION_DB_URL")
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan manager"""
-    logger.info(f"Starting {APP_NAME} in {os.getenv('ENVIRONMENT')} environment")
+    logger.info(f"Starting {APP_NAME}")
     
     try:
         from session_service import session_service
@@ -175,7 +173,6 @@ async def query_endpoint(request_data: QueryRequest):
 
         # NOW get updated session after agent execution
         updated_session = await session_service.get_session(
-            app_name=APP_NAME,
             user_id=request_data.userId,
             session_id=request_data.sessionId,
         )
