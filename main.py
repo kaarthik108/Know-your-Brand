@@ -2,7 +2,6 @@ import os
 import uvicorn
 import json
 import logging
-import asyncio
 from typing import Any, Dict, AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -11,11 +10,11 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from google.adk.runners import Runner
-from google.adk.sessions import InMemorySessionService, DatabaseSessionService
 from google.genai import types
 
 from mcp_brand_agent.agent import root_agent
 from database import db_manager
+from session_service import session_service
 # Load environment variables
 load_dotenv('.env')
 
@@ -28,47 +27,24 @@ ALLOWED_ORIGINS = ["*"]
 
 SESSION_DB_URL = os.environ.get("SESSION_DB_URL")
 
-session_service = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan manager"""
-    global session_service
-    
-    logger.info(f"Starting {APP_NAME} application")
+    logger.info(f"Starting {APP_NAME} in {os.getenv('ENVIRONMENT')} environment")
     
     try:
-        if SESSION_DB_URL:
-            session_service = DatabaseSessionService(db_url=SESSION_DB_URL)
-            logger.info(f"DatabaseSessionService initialized with URL: {SESSION_DB_URL}")
-        else:
-            session_service = InMemorySessionService()
-            logger.info("InMemorySessionService initialized (no SESSION_DB_URL provided)")
-            
-        db_manager.init_tables()
-        logger.info("Database tables initialized")
-        
-        try:
-            agent_test = root_agent
-            logger.info("Agent successfully imported and accessible")
-            
-            # Test MCP token availability
-            mcp_token = os.getenv("MCP_TOKEN")
-            if not mcp_token:
-                logger.warning("MCP_TOKEN not found - MCP tools may not work properly")
-            else:
-                logger.info("MCP_TOKEN found - MCP tools should be available")
-                
-        except Exception as agent_e:
-            logger.error(f"Warning: Agent import issue: {agent_e}")
-        
+        from session_service import session_service
+        await session_service.get_session_service()
+        logger.info("Session service initialized successfully")
     except Exception as e:
-        logger.error(f"Failed to initialize services: {e}")
-        raise RuntimeError(f"Failed to initialize services: {e}")
+        logger.error(f"Failed to initialize session service: {e}")
+        raise
     
     yield
     
     logger.info("Application shutdown complete")
+
 
 app = FastAPI(lifespan=lifespan)
 app.add_middleware(
@@ -142,42 +118,6 @@ async def run_agent_logic(
     return final_response
 
 
-async def get_or_create_session(user_id: str, session_id: str) -> Any:
-    """
-    Retrieves an existing session or creates a new one if it doesn't exist.
-    """
-    try:
-        if session_service is None:
-            logger.error("Session service is not initialized")
-            raise RuntimeError("Session service not initialized")
-
-        logger.info(f"Attempting to get session for user_id={user_id}, session_id={session_id}")
-
-        current_session = await session_service.get_session(
-            app_name=APP_NAME,
-            user_id=user_id,
-            session_id=session_id,
-        )
-
-        if not current_session:
-            logger.info(f"Session not found for user {user_id}, session {session_id}. Creating new session.")
-            current_session = await session_service.create_session(
-                app_name=APP_NAME,
-                user_id=user_id,
-                session_id=session_id,
-            )
-
-        if not current_session:
-            raise RuntimeError(f"Failed to create session for user {user_id}, session {session_id}")
-
-        logger.info(f"Session successfully retrieved/created for user {user_id}, session {session_id}")
-        return current_session
-
-    except Exception as e:
-        logger.error(f"Error during session lookup/creation for session {session_id}: {e}")
-        raise
-
-
 class QueryRequest(BaseModel):
     userId: str
     sessionId: str
@@ -215,7 +155,7 @@ async def query_endpoint(request_data: QueryRequest):
         db_manager.update_status(request_data.userId, request_data.sessionId, "running")
         
         # Get or create session FIRST
-        await get_or_create_session(
+        await session_service.get_or_create_session(
             request_data.userId,
             request_data.sessionId
         )
