@@ -2,6 +2,7 @@ import os
 import uvicorn
 import json
 import logging
+import asyncio
 from typing import Any, Dict, AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -50,6 +51,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         try:
             agent_test = root_agent
             logger.info("Agent successfully imported and accessible")
+            
+            # Test MCP token availability
+            mcp_token = os.getenv("MCP_TOKEN")
+            if not mcp_token:
+                logger.warning("MCP_TOKEN not found - MCP tools may not work properly")
+            else:
+                logger.info("MCP_TOKEN found - MCP tools should be available")
+                
         except Exception as agent_e:
             logger.error(f"Warning: Agent import issue: {agent_e}")
         
@@ -189,6 +198,11 @@ async def query_endpoint(request_data: QueryRequest):
                 return existing_request['results']
             elif existing_request['status'] in ['pending', 'running']:
                 return {"message": "Analysis already in progress"}
+            elif existing_request['status'] == 'failed':
+                # If it failed due to MCP issues, allow retry after some time
+                logger.info(f"Previous request failed, allowing retry for user {request_data.userId}, session {request_data.sessionId}")
+                # Reset status to pending for retry
+                db_manager.update_status(request_data.userId, request_data.sessionId, "pending")
         
         # Create database entry with 'pending' status
         db_manager.create_request(
@@ -207,13 +221,30 @@ async def query_endpoint(request_data: QueryRequest):
         )
 
         # Run the agent logic BEFORE accessing session state
-        agent_response = await run_agent_logic(
-            request_data.userId,
-            request_data.sessionId,
-            request_data.question
-        )
-        
-        logger.info(f"Agent response: {agent_response}")
+        try:
+            # Add timeout to prevent hanging on MCP initialization
+            agent_response = await asyncio.wait_for(
+                run_agent_logic(
+                    request_data.userId,
+                    request_data.sessionId,
+                    request_data.question
+                ),
+                timeout=300  # 5 minutes timeout
+            )
+            logger.info(f"Agent response: {agent_response}")
+        except asyncio.TimeoutError:
+            logger.error(f"Agent execution timed out for session {request_data.sessionId}")
+            db_manager.update_status(request_data.userId, request_data.sessionId, "failed", "Agent execution timed out")
+            raise HTTPException(status_code=504, detail="Request timed out")
+        except Exception as agent_error:
+            logger.error(f"Agent execution failed: {agent_error}")
+            # If it's an MCP initialization error, mark as failed and return error
+            if "mcp" in str(agent_error).lower() or "session" in str(agent_error).lower():
+                db_manager.update_status(request_data.userId, request_data.sessionId, "failed", f"MCP initialization failed: {str(agent_error)}")
+                raise HTTPException(status_code=503, detail="Service temporarily unavailable. MCP tools are not accessible.")
+            else:
+                db_manager.update_status(request_data.userId, request_data.sessionId, "failed", str(agent_error))
+                raise HTTPException(status_code=500, detail="Agent execution failed")
 
         # NOW get updated session after agent execution
         updated_session = await session_service.get_session(

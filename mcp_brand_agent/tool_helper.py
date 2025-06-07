@@ -65,13 +65,25 @@ dotenv.load_dotenv('.env')
 # search_web.__name__ = "search_web"
 # search_web.__doc__ = "Search the web for information based on the provided query."
 
-search_web = MCPToolset(
-    connection_params=StdioServerParameters(
-        command="npx", 
-        args=["-y", "@brightdata/mcp"],
-        env={
-            "API_TOKEN": os.getenv("MCP_TOKEN"),
-            "WEB_UNLOCKER_ZONE": "web_unlocker1",
-        }
-    ),
-)
+def create_search_web_tool():
+    """Create the search_web tool with proper error handling"""
+    try:
+        api_token = os.getenv("MCP_TOKEN")
+        if not api_token:
+            raise ValueError("MCP_TOKEN environment variable is required")
+        
+        return MCPToolset(
+            connection_params=StdioServerParameters(
+                command="npx", 
+                args=["-y", "@brightdata/mcp"],
+                env={
+                    "API_TOKEN": api_token,
+                    "WEB_UNLOCKER_ZONE": "web_unlocker1",
+                }
+            ),
+        )
+    except Exception as e:
+        print(f"Failed to create search_web tool: {e}")
+        raise
+
+search_web = create_search_web_tool()
