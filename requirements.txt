@@ -1,4 +1,4 @@
-google-adk
+google-adk==1.0.0
 python-dotenv
 pydantic
 asyncio
