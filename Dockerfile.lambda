@@ -1,0 +1,23 @@
+FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
+COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.9.1 /lambda-adapter /opt/extensions/lambda-adapter
+
+WORKDIR /app
+
+ENV UV_LINK_MODE=copy
+ENV PYTHONUNBUFFERED=1
+ENV AWS_LWA_INVOKE_MODE=response_stream
+ENV UV_CACHE_DIR=/tmp/.uv-cache
+ENV UV_NO_CACHE=1
+
+COPY requirements.txt /app/requirements.txt
+
+RUN uv pip install --system -r requirements.txt
+
+ADD . /app
+
+# Place executables in the environment at the front of the path
+ENV PATH="/app/.venv/bin:$PATH"
+
+EXPOSE 8080
+
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
