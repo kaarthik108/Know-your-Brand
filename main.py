@@ -57,7 +57,7 @@ async def run_agent_logic(
     user_id: str, session_id: str, question: str
 ) -> Dict[str, Any]:
     """
-    Runs the agent logic asynchronously, using pre-updated session state.
+    Runs the agent logic asynchronously and waits for completion.
 
     Args:
         user_id: Unique identifier for the user
@@ -77,7 +77,12 @@ async def run_agent_logic(
         logger.error("Session service is not initialized")
         return {"answerText": "Error: Session service not initialized."}
 
-    runner = Runner(agent=agent, app_name=APP_NAME, session_service=session_service)
+    try:
+        service = await session_service.get_session_service()
+        runner = Runner(agent=agent, app_name=APP_NAME, session_service=service)
+    except Exception as e:
+        logger.error(f"Failed to create runner: {e}")
+        return {"answerText": "Error: Could not create runner."}
 
     initial_content = types.Content(role="user", parts=[types.Part(text=question)])
     final_response = None
@@ -125,6 +130,7 @@ class QueryRequest(BaseModel):
 @app.post("/query")
 async def query_endpoint(request_data: QueryRequest):
     try:
+        await session_service.get_session_service()
         # Check if analysis already exists
         existing_request = db_manager.get_existing_request(
             request_data.userId, 

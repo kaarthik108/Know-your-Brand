@@ -3,7 +3,7 @@ python-dotenv
 pydantic
 litellm
 fastapi
-uvicorn
+uvicorn[standard]
 psycopg2-binary
 supabase
 langchain-mcp-adapters==0.1.1
