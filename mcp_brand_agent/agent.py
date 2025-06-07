@@ -1,11 +1,13 @@
 import os
-import asyncio
 from google.adk.agents import LlmAgent, ParallelAgent, LoopAgent, SequentialAgent
 from pydantic import BaseModel
 from typing import List, Dict, Literal
 from google.adk.models.lite_llm import LiteLlm
 from google.adk.tools import ToolContext
-from .tool_helper import search_web
+from google.genai import types
+from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParameters
+
+# from google.adk.planners.built_in_planner import BuiltInPlanner
 class SentimentBreakdown(BaseModel):
     positive: float
     negative: float
@@ -51,10 +53,11 @@ class BrandSentimentReport(BaseModel):
 #     model="groq/qwen-qwq-32b",
 #     api_key=os.getenv("GROQ_API_KEY"),
 # )
-model_extract = model_analysis = LiteLlm(
-    model="o4-mini",
-    api_key=os.getenv("OPENAI_API_KEY")
-)
+# model_extract = model_analysis = LiteLlm(
+#     model="o4-mini",
+#     api_key=os.getenv("OPENAI_API_KEY")
+# )
+model_extract = model_analysis = "gemini-2.5-flash-preview-05-20"
 # model_qwen = LiteLlm(
 #     model="together_ai/Qwen/Qwen2.5-72B-Instruct-Turbo",
 #     api_key=os.getenv("TOGETHERAI_API_KEY"),
@@ -67,6 +70,7 @@ def exit_loop(tool_context: ToolContext):
   tool_context.actions.escalate = True
   # Return empty dict as tools should typically return JSON-serializable output
   return {}
+TARGET_FOLDER_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mcp_brand_agent")
 
 
 # Create platform-specific search agents
@@ -77,9 +81,9 @@ twitter_agent = LlmAgent(
     instruction="""
 Search for exactly 3 Twitter/X posts about the brand, then analyze and return structured data.
 
-First, search using brand name, hashtags, and keywords from x.com domain only, Extract 10+ significant words for word_cloud_themes_on_platform.
+First, search using brand name, hashtags, and keywords from x.com domain only. Extract 10+ significant words for word_cloud_themes_on_platform.
 
-Then analyze the posts and return this JSON structure:
+CRITICAL: Return ONLY valid JSON in this EXACT structure (no markdown, no explanations):
 {
   "brand_name": "the brand name",
   "platform_name": "Twitter",
@@ -100,18 +104,33 @@ Then analyze the posts and return this JSON structure:
     {
       "date": "actual date or Recent",
       "text": "actual post content",
-      "sentiment": "positive/negative/neutral",
+      "sentiment": "positive",
       "ethical_context": "relevant theme",
       "url": "post link or x.com domain"
     }
   ]
 }
 
- Return only valid JSON.
+IMPORTANT: 
+- sentiment must be exactly "positive", "negative", or "neutral"
+- platform_name must be exactly "Twitter"
+- Return ONLY the JSON object, no other text
     """,
-    tools=[search_web],
+    tools=[MCPToolset(
+            connection_params=StdioServerParameters(
+                command='npx',
+                args=["-y", "@brightdata/mcp", os.path.abspath(TARGET_FOLDER_PATH)],
+                env={
+                    "API_TOKEN": os.getenv("MCP_TOKEN"),
+                    # "WEB_UNLOCKER_ZONE": "web_unlocker1",
+                    # "BROWSER_AUTH": "SBR_USER:SBR_PASS"
+                }
+            )
+        )],
     # output_schema=SinglePlatformAnalysisReport,
-    output_key="twitter_results"
+    output_key="twitter_results",
+    # generate_content_config=types.GenerateContentConfig(temperature=0.01),
+
 )
 
 twitter_extract_agent = LlmAgent(
@@ -119,15 +138,30 @@ twitter_extract_agent = LlmAgent(
     name='twitter_extract_agent',
     description="Extracts the results from the twitter_agent in the structured JSON format",
     instruction="""
-    Extract the results from the twitter_agent 
+    You will receive data from the twitter_agent. Your task is to extract and return ONLY valid JSON that matches the required schema.
 
-    {twitter_results}
+    Input data: {twitter_results}
 
-    Return the results in the structured JSON format: 
+    IMPORTANT INSTRUCTIONS:
+    1. If the input contains JSON wrapped in markdown (```json ... ```), extract only the JSON content
+    2. If the input is already valid JSON, return it as-is
+    3. Ensure all required fields are present: brand_name, platform_name, total_mentions_on_platform, platform_sentiment_breakdown, ethical_highlights_on_platform, word_cloud_themes_on_platform, mentions_on_platform
+    4. Return ONLY the JSON object, no markdown formatting, no explanations
+    5. Ensure platform_name is exactly "Twitter"
+    
+    Return the clean JSON:
     """,
     output_key="final_twitter_results",
-    output_schema= SinglePlatformAnalysisReport
+    output_schema=SinglePlatformAnalysisReport,
+    # disallow_transfer_to_parent=True,
+    # disallow_transfer_to_peers=True
+        # generate_content_config=types.GenerateContentConfig(temperature=0.01)
 )
+# twitter_agent.planner = twitter_extract_agent.planner = BuiltInPlanner(
+#     thinking_config=types.ThinkingConfig(
+#         thinking_budget=0,
+#     )
+# )
 
 twitter_sequential_agent = SequentialAgent(
     name="twitter_sequential_agent",
@@ -149,9 +183,9 @@ linkedin_agent = LlmAgent(
     instruction="""
 Search for exactly 3 LinkedIn posts about the brand, then analyze and return structured data.
 
-First, search company pages, executives, and industry posts from linkedin.com domain only.
+First, search company pages, executives, and industry posts from linkedin.com domain only. Extract 10+ significant words for word_cloud_themes_on_platform.
 
-Then analyze the posts and return this JSON structure:
+CRITICAL: Return ONLY valid JSON in this EXACT structure (no markdown, no explanations):
 {
   "brand_name": "the brand name",
   "platform_name": "LinkedIn",
@@ -172,18 +206,32 @@ Then analyze the posts and return this JSON structure:
     {
       "date": "actual date or Recent",
       "text": "actual post content",
-      "sentiment": "positive/negative/neutral",
+      "sentiment": "positive",
       "ethical_context": "relevant theme",
       "url": "post link or linkedin.com domain"
     }
   ]
 }
 
-Extract 10+ significant words for word_cloud_themes_on_platform. Return only valid JSON.
+IMPORTANT: 
+- sentiment must be exactly "positive", "negative", or "neutral"
+- platform_name must be exactly "LinkedIn"
+- Return ONLY the JSON object, no other text
     """,
-    tools=[search_web],
+    tools=[MCPToolset(
+            connection_params=StdioServerParameters(
+                command='npx',
+                args=["-y", "@brightdata/mcp", os.path.abspath(TARGET_FOLDER_PATH)],
+                env={
+                    "API_TOKEN": os.getenv("MCP_TOKEN"),
+                    # "WEB_UNLOCKER_ZONE": "web_unlocker1",
+                    # "BROWSER_AUTH": "SBR_USER:SBR_PASS"
+                }
+            )
+        )],
     # output_schema=SinglePlatformAnalysisReport,
-    output_key="linkedin_results"
+    output_key="linkedin_results",
+    # generate_content_config=types.GenerateContentConfig(temperature=0.01),
 )
 
 linkedin_extract_agent = LlmAgent(
@@ -191,15 +239,30 @@ linkedin_extract_agent = LlmAgent(
     name='linkedin_extract_agent',
     description="Extracts the results from the linkedin_agent in the structured JSON format",
     instruction="""
-    Extract the results from the linkedin_agent and return the results in the structured JSON format: 
+    You will receive data from the linkedin_agent. Your task is to extract and return ONLY valid JSON that matches the required schema.
 
-    {linkedin_results}
+    Input data: {linkedin_results}
 
-    Return the results in the structured JSON format: 
+    IMPORTANT INSTRUCTIONS:
+    1. If the input contains JSON wrapped in markdown (```json ... ```), extract only the JSON content
+    2. If the input is already valid JSON, return it as-is
+    3. Ensure all required fields are present: brand_name, platform_name, total_mentions_on_platform, platform_sentiment_breakdown, ethical_highlights_on_platform, word_cloud_themes_on_platform, mentions_on_platform
+    4. Return ONLY the JSON object, no markdown formatting, no explanations
+    5. Ensure platform_name is exactly "LinkedIn"
+    
+    Return the clean JSON:
     """,
     output_key="final_linkedin_results",
-    output_schema= SinglePlatformAnalysisReport
+    output_schema=SinglePlatformAnalysisReport,
+    # disallow_transfer_to_parent=True,
+    # disallow_transfer_to_peers=True
+    # generate_content_config=types.GenerateContentConfig(temperature=0.01)
 )
+# linkedin_agent.planner = linkedin_extract_agent.planner = BuiltInPlanner(
+#     thinking_config=types.ThinkingConfig(
+#         thinking_budget=0,
+#     )
+# )
 
 linkedin_sequential_agent = SequentialAgent(
     name="linkedin_sequential_agent",
@@ -221,9 +284,9 @@ reddit_agent = LlmAgent(
     instruction="""
 Search for exactly 3 Reddit posts about the brand, then analyze and return structured data.
 
-First, search relevant subreddits and brand discussions from reddit.com domain only.
+First, search relevant subreddits and brand discussions from reddit.com domain only. Extract 10+ significant words for word_cloud_themes_on_platform.
 
-Then analyze the posts and return this JSON structure:
+CRITICAL: Return ONLY valid JSON in this EXACT structure (no markdown, no explanations):
 {
   "brand_name": "the brand name",
   "platform_name": "Reddit",
@@ -244,18 +307,32 @@ Then analyze the posts and return this JSON structure:
     {
       "date": "actual date or Recent",
       "text": "actual post content",
-      "sentiment": "positive/negative/neutral",
+      "sentiment": "positive",
       "ethical_context": "relevant theme",
       "url": "post link or reddit.com domain"
     }
   ]
 }
 
-Extract 10+ significant words for word_cloud_themes_on_platform. Return only valid JSON.
+IMPORTANT: 
+- sentiment must be exactly "positive", "negative", or "neutral"
+- platform_name must be exactly "Reddit"
+- Return ONLY the JSON object, no other text
     """,
-    tools=[search_web],
+    tools=[MCPToolset(
+            connection_params=StdioServerParameters(
+                command='npx',
+                args=["-y", "@brightdata/mcp", os.path.abspath(TARGET_FOLDER_PATH)],
+                env={
+                    "API_TOKEN": os.getenv("MCP_TOKEN"),
+                    # "WEB_UNLOCKER_ZONE": "web_unlocker1",
+                    # "BROWSER_AUTH": "SBR_USER:SBR_PASS"
+                }
+            )
+        )],
     # output_schema=SinglePlatformAnalysisReport,
-    output_key="reddit_results"
+    output_key="reddit_results",
+    # generate_content_config=types.GenerateContentConfig(temperature=0.01),
 )
 
 reddit_extract_agent = LlmAgent(
@@ -263,15 +340,30 @@ reddit_extract_agent = LlmAgent(
     model=model_extract,
     description="Extracts the results from the reddit_agent in the structured JSON format",
     instruction="""
-    Extract the results from the reddit_agent and return the results in the structured JSON format: 
+    You will receive data from the reddit_agent. Your task is to extract and return ONLY valid JSON that matches the required schema.
 
-    {reddit_results}
+    Input data: {reddit_results}
 
-    Return the results in the structured JSON format: 
+    IMPORTANT INSTRUCTIONS:
+    1. If the input contains JSON wrapped in markdown (```json ... ```), extract only the JSON content
+    2. If the input is already valid JSON, return it as-is
+    3. Ensure all required fields are present: brand_name, platform_name, total_mentions_on_platform, platform_sentiment_breakdown, ethical_highlights_on_platform, word_cloud_themes_on_platform, mentions_on_platform
+    4. Return ONLY the JSON object, no markdown formatting, no explanations
+    5. Ensure platform_name is exactly "Reddit"
+    
+    Return the clean JSON:
     """,
     output_key="final_reddit_results",
-    output_schema= SinglePlatformAnalysisReport
+    output_schema=SinglePlatformAnalysisReport,
+    # disallow_transfer_to_parent=True,
+    # disallow_transfer_to_peers=True
+    # generate_content_config=types.GenerateContentConfig(temperature=0.01)
 )
+# reddit_agent.planner = reddit_extract_agent.planner = BuiltInPlanner(
+#     thinking_config=types.ThinkingConfig(
+#         thinking_budget=0,
+#     )
+# )
 
 reddit_sequential_agent = SequentialAgent(
     name="reddit_sequential_agent",
@@ -294,9 +386,9 @@ news_agent = LlmAgent(
     instruction="""
 Search for exactly 3 news articles about the brand, then analyze and return structured data.
 
-First, search major news sites and industry publications from reputable news sites only.
+First, search major news sites and industry publications from reputable news sites only. Extract 10+ significant words for word_cloud_themes_on_platform.
 
-Then analyze the articles and return this JSON structure:
+CRITICAL: Return ONLY valid JSON in this EXACT structure (no markdown, no explanations):
 {
   "brand_name": "the brand name",
   "platform_name": "News",
@@ -317,18 +409,32 @@ Then analyze the articles and return this JSON structure:
     {
       "date": "actual date or Recent",
       "text": "actual article excerpt",
-      "sentiment": "positive/negative/neutral",
+      "sentiment": "positive",
       "ethical_context": "relevant theme",
       "url": "article link or news site domain"
     }
   ]
 }
 
-Extract 10+ significant words for word_cloud_themes_on_platform. Return only valid JSON.
+IMPORTANT: 
+- sentiment must be exactly "positive", "negative", or "neutral"
+- platform_name must be exactly "News"
+- Return ONLY the JSON object, no other text
     """,
-    tools=[search_web],
+    tools=[MCPToolset(
+            connection_params=StdioServerParameters(
+                command='npx',
+                args=["-y", "@brightdata/mcp", os.path.abspath(TARGET_FOLDER_PATH)],
+                env={
+                    "API_TOKEN": os.getenv("MCP_TOKEN"),
+                    # "WEB_UNLOCKER_ZONE": "web_unlocker1",
+                    # "BROWSER_AUTH": "SBR_USER:SBR_PASS"
+                }
+            )
+        )],
     # output_schema=SinglePlatformAnalysisReport,
-    output_key="news_results"
+    output_key="news_results",
+    # generate_content_config=types.GenerateContentConfig(temperature=0.01),
 )
 
 news_extract_agent = LlmAgent(
@@ -336,16 +442,30 @@ news_extract_agent = LlmAgent(
     model=model_extract,
     description="Extracts the results from the news_agent in the structured JSON format",
     instruction="""
-    Extract the results from the news_agent and return the results in the structured JSON format: 
+    You will receive data from the news_agent. Your task is to extract and return ONLY valid JSON that matches the required schema.
 
-    {news_results}
+    Input data: {news_results}
 
-    Return the results in the structured JSON format: 
+    IMPORTANT INSTRUCTIONS:
+    1. If the input contains JSON wrapped in markdown (```json ... ```), extract only the JSON content
+    2. If the input is already valid JSON, return it as-is
+    3. Ensure all required fields are present: brand_name, platform_name, total_mentions_on_platform, platform_sentiment_breakdown, ethical_highlights_on_platform, word_cloud_themes_on_platform, mentions_on_platform
+    4. Return ONLY the JSON object, no markdown formatting, no explanations
+    5. Ensure platform_name is exactly "News"
+    
+    Return the clean JSON:
     """,
     output_key="final_news_results",
-    output_schema= SinglePlatformAnalysisReport
+    output_schema=SinglePlatformAnalysisReport,
+    # disallow_transfer_to_parent=True,
+    # disallow_transfer_to_peers=True
+    # generate_content_config=types.GenerateContentConfig(temperature=0.01)
 )
-
+# news_agent.planner = news_extract_agent.planner = BuiltInPlanner(
+#     thinking_config=types.ThinkingConfig(
+#         thinking_budget=0,
+#     )
+# )
 news_sequential_agent = SequentialAgent(
     name="news_sequential_agent",
     description="Runs the news_agent and news_extract_agent sequentially",
