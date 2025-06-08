@@ -12,8 +12,8 @@ from google.adk.runners import Runner
 from google.adk.sessions import DatabaseSessionService
 from google.genai import types
 
-from mcp_brand_agent.agent import root_agent
 from database import db_manager
+from mcp_brand_agent.agent import root_agent
 # Load environment variables
 load_dotenv('.env')
 
@@ -76,7 +76,7 @@ async def run_agent_logic(
 
     runner = Runner(agent=agent, app_name=APP_NAME, session_service=session_service)
 
-    initial_content = types.Content(role="user", parts=[types.Part(text=question)])
+    initial_content = types.Content(role="user", parts=[types.Part(text=f"user_input: {question}")])
     final_response = None
 
     try:
@@ -115,6 +115,7 @@ async def get_or_create_session(user_id: str, session_id: str) -> Any:
     Retrieves an existing session or creates a new one if it doesn't exist.
     """
     try:
+        session_service = init_session_service()
         if session_service is None:
             print("ERROR: session_service is None!")
             raise RuntimeError("Session service not initialized")
@@ -184,11 +185,24 @@ async def query_endpoint(request_data: QueryRequest):
         )
 
         # Run the agent logic BEFORE accessing session state
-        await run_agent_logic(
-            request_data.userId,
-            request_data.sessionId,
-            request_data.question
-        )
+        try:
+            agent_response = await run_agent_logic(
+                request_data.userId,
+                request_data.sessionId,
+                request_data.question
+            )
+            print(f"Agent response: {agent_response}")
+            
+            # Check if agent execution failed
+            if agent_response.get("answerText") == "An internal error occurred during agent execution.":
+                print("Agent execution failed, updating status")
+                db_manager.update_status(request_data.userId, request_data.sessionId, "failed", "Agent execution failed due to timeout")
+                raise HTTPException(status_code=500, detail="Agent execution failed due to timeout")
+                
+        except Exception as agent_error:
+            print(f"Agent execution failed: {agent_error}")
+            db_manager.update_status(request_data.userId, request_data.sessionId, "failed", str(agent_error))
+            raise HTTPException(status_code=500, detail="Agent execution failed")
 
         # NOW get updated session after agent execution
         updated_session = await session_service.get_session(
