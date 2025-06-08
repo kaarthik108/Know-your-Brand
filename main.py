@@ -2,6 +2,7 @@ import os
 import uvicorn
 import json
 import logging
+import asyncio
 from typing import Any, Dict
 
 from dotenv import load_dotenv
@@ -35,7 +36,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def init_session_service() -> DatabaseSessionService:
+async def init_session_service() -> DatabaseSessionService:
     try:
         service = DatabaseSessionService(db_url=SESSION_DB_URL)
         print(f"DatabaseSessionService initialized with URL: {SESSION_DB_URL}")
@@ -44,12 +45,15 @@ def init_session_service() -> DatabaseSessionService:
         print(f"Failed to initialize ADK components: {e}")
         raise RuntimeError(f"Failed to initialize ADK components: {e}")
 
-try:
-    session_service = init_session_service()
-    print(f"Global session_service initialized: {type(session_service)}")
-except Exception as e:
-    print(f"CRITICAL: Failed to initialize global session_service: {e}")
-    session_service = None
+# Global session service will be initialized on first use
+session_service = None
+
+async def get_session_service():
+    global session_service
+    if session_service is None:
+        session_service = await init_session_service()
+        print(f"Global session_service initialized: {type(session_service)}")
+    return session_service
 
 # session_service = InMemorySessionService()
 
@@ -74,32 +78,48 @@ async def run_agent_logic(
         print(f"Failed to get static agent reference: {e}")
         return {"answerText": "Error: Could not get static agent reference."}
 
-    runner = Runner(agent=agent, app_name=APP_NAME, session_service=session_service)
+    service = await get_session_service()
+    runner = Runner(agent=agent, app_name=APP_NAME, session_service=service)
 
     initial_content = types.Content(role="user", parts=[types.Part(text=f"user_input: {question}")])
     final_response = None
 
     try:
-        events = runner.run_async(
-            user_id=user_id, session_id=session_id, new_message=initial_content
-        )
+        # Add timeout wrapper for the entire agent execution
+        async def execute_agent():
+            events = runner.run_async(
+                user_id=user_id, session_id=session_id, new_message=initial_content
+            )
 
-        async for event in events:
-            if event.is_final_response():
-                if (
-                    event.content is None
-                    or not hasattr(event.content, "parts")
-                    or not event.content.parts
-                ):
-                    print("Warning: Final response event has no content or parts")
-                    continue
+            async for event in events:
+                if event.is_final_response():
+                    if (
+                        event.content is None
+                        or not hasattr(event.content, "parts")
+                        or not event.content.parts
+                    ):
+                        print("Warning: Final response event has no content or parts")
+                        continue
 
-                response_text = event.content.parts[0].text
-                try:
-                    final_response = json.loads(response_text)
-                except json.JSONDecodeError:
-                    final_response = {"answerText": response_text}
+                    response_text = event.content.parts[0].text
+                    try:
+                        return json.loads(response_text)
+                    except json.JSONDecodeError:
+                        return {"answerText": response_text}
+            
+            return None
+        
+        # Execute with timeout
+        final_response = await asyncio.wait_for(execute_agent(), timeout=60.0)
+        
+        if final_response is None:
+            final_response = {"answerText": "No response received from agent"}
 
+    except asyncio.TimeoutError:
+        print(f"Agent execution timed out after 60 seconds for session {session_id}")
+        final_response = {
+            "answerText": "Agent execution timed out. Please try again later."
+        }
     except Exception as e:
         print(f"An error occurred during agent execution for session {session_id}: {e}")
         if final_response is None:
@@ -115,14 +135,14 @@ async def get_or_create_session(user_id: str, session_id: str) -> Any:
     Retrieves an existing session or creates a new one if it doesn't exist.
     """
     try:
-        session_service = init_session_service()
-        if session_service is None:
+        service = await get_session_service()
+        if service is None:
             print("ERROR: session_service is None!")
             raise RuntimeError("Session service not initialized")
 
         print(f"DEBUG: Attempting to get session for user_id={user_id}, session_id={session_id}")
 
-        current_session = await session_service.get_session(
+        current_session = await service.get_session(
             app_name=APP_NAME,
             user_id=user_id,
             session_id=session_id,
@@ -130,7 +150,7 @@ async def get_or_create_session(user_id: str, session_id: str) -> Any:
 
         if not current_session:
             print(f"Session not found for user {user_id}, session {session_id}. Creating new session.")
-            current_session = await session_service.create_session(
+            current_session = await service.create_session(
                 app_name=APP_NAME,
                 user_id=user_id,
                 session_id=session_id,
@@ -157,7 +177,7 @@ class QueryRequest(BaseModel):
 async def query_endpoint(request_data: QueryRequest):
     try:
         # Check if analysis already exists
-        existing_request = db_manager.get_existing_request(
+        existing_request = await db_manager.get_existing_request(
             request_data.userId, 
             request_data.sessionId
         )
@@ -169,14 +189,14 @@ async def query_endpoint(request_data: QueryRequest):
                 return {"message": "Analysis already in progress"}
         
         # Create database entry with 'pending' status
-        db_manager.create_request(
+        await db_manager.create_request(
             request_data.userId, 
             request_data.sessionId, 
             request_data.question
         )
         
         # Update status to 'running' when analysis starts
-        db_manager.update_status(request_data.userId, request_data.sessionId, "running")
+        await db_manager.update_status(request_data.userId, request_data.sessionId, "running")
         
         # Get or create session FIRST
         await get_or_create_session(
@@ -196,16 +216,17 @@ async def query_endpoint(request_data: QueryRequest):
             # Check if agent execution failed
             if agent_response.get("answerText") == "An internal error occurred during agent execution.":
                 print("Agent execution failed, updating status")
-                db_manager.update_status(request_data.userId, request_data.sessionId, "failed", "Agent execution failed due to timeout")
+                await db_manager.update_status(request_data.userId, request_data.sessionId, "failed", "Agent execution failed due to timeout")
                 raise HTTPException(status_code=500, detail="Agent execution failed due to timeout")
                 
         except Exception as agent_error:
             print(f"Agent execution failed: {agent_error}")
-            db_manager.update_status(request_data.userId, request_data.sessionId, "failed", str(agent_error))
+            await db_manager.update_status(request_data.userId, request_data.sessionId, "failed", str(agent_error))
             raise HTTPException(status_code=500, detail="Agent execution failed")
 
         # NOW get updated session after agent execution
-        updated_session = await session_service.get_session(
+        service = await get_session_service()
+        updated_session = await service.get_session(
             app_name=APP_NAME,
             user_id=request_data.userId,
             session_id=request_data.sessionId,
@@ -244,17 +265,17 @@ async def query_endpoint(request_data: QueryRequest):
         }
 
         # Update status to 'completed' when done
-        db_manager.update_status(request_data.userId, request_data.sessionId, "completed")
-        db_manager.save_results(request_data.userId, request_data.sessionId, response_data)
+        await db_manager.update_status(request_data.userId, request_data.sessionId, "completed")
+        await db_manager.save_results(request_data.userId, request_data.sessionId, response_data)
 
         return response_data
 
     except ValueError as e:
-        db_manager.update_status(request_data.userId, request_data.sessionId, "failed", str(e))
+        await db_manager.update_status(request_data.userId, request_data.sessionId, "failed", str(e))
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        logger.error(f"Unhandled exception in query_endpoint: {e}")
-        db_manager.update_status(request_data.userId, request_data.sessionId, "failed", "Internal server error.")
+        print(f"Unhandled exception in query_endpoint: {e}")
+        await db_manager.update_status(request_data.userId, request_data.sessionId, "failed", "Internal server error.")
         raise HTTPException(status_code=500, detail="Internal server error.")
 
 

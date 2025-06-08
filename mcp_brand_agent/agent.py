@@ -58,9 +58,8 @@ class BrandSentimentReport(BaseModel):
 #     api_key=os.getenv("OPENAI_API_KEY")
 # )
 model_extract = model_analysis = LiteLlm(
-    model="o4-mini",
-    api_key=os.getenv("OPENAI_API_KEY"),
-    max_tokens=93762
+    model="gpt-4.1",
+    api_key=os.getenv("OPENAI_API_KEY")
 )
 # model_qwen = LiteLlm(
 #     model="together_ai/Qwen/Qwen2.5-72B-Instruct-Turbo",
