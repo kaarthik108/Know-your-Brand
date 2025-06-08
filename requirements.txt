@@ -1,4 +1,4 @@
-google-adk==1.2.0
+google-adk==1.2.1
 python-dotenv
 pydantic
 litellm==1.72.2
@@ -6,3 +6,4 @@ fastapi
 uvicorn[standard]
 deprecated
 psycopg2-binary
+langchain-mcp-adapters

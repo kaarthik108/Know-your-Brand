@@ -1,5 +1,5 @@
 import os
-import litellm
+# import litellm
 from google.adk.agents import LlmAgent, ParallelAgent, LoopAgent, SequentialAgent
 from pydantic import BaseModel
 from typing import List, Dict, Literal
@@ -62,10 +62,13 @@ class BrandSentimentReport(BaseModel):
 if not os.getenv("OPENAI_API_KEY"):
     raise ValueError("OPENAI_API_KEY is not set")
 
-model_extract = model_analysis = LiteLlm(
+model_extract = LiteLlm(
     model="o4-mini",
-    api_key=os.getenv("OPENAI_API_KEY"),
-    max_tokens=93762
+    api_key=os.getenv("OPENAI_API_KEY")
+)
+model_analysis = LiteLlm(
+    model="o4-mini",
+    api_key=os.getenv("OPENAI_API_KEY")
 )
 # model_extract = model_analysis = "gemini-2.5-flash-preview-05-20"
 # model_qwen = LiteLlm(
@@ -73,7 +76,7 @@ model_extract = model_analysis = LiteLlm(
 #     api_key=os.getenv("TOGETHERAI_API_KEY"),
 #     # max_tokens=93762
 # )
-litellm._turn_on_debug()
+# litellm._turn_on_debug()
 
 def exit_loop(tool_context: ToolContext):
   """Call this function ONLY when the critique indicates no further changes are needed, signaling the iterative process should end."""
@@ -81,7 +84,6 @@ def exit_loop(tool_context: ToolContext):
   tool_context.actions.escalate = True
   # Return empty dict as tools should typically return JSON-serializable output
   return {}
-TARGET_FOLDER_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mcp_brand_agent")
 
 
 # Create platform-specific search agents
@@ -129,9 +131,7 @@ IMPORTANT:
     """,
     tools=[search_web],
     # output_schema=SinglePlatformAnalysisReport,
-    output_key="twitter_results",
-    # generate_content_config=types.GenerateContentConfig(temperature=0.01),
-
+    output_key="twitter_results"
 )
 
 twitter_extract_agent = LlmAgent(
@@ -459,6 +459,6 @@ root_agent = ParallelAgent(
         twitter_sequential_agent,
         linkedin_sequential_agent,
         reddit_sequential_agent,
-        news_sequential_agent
+        news_sequential_agent 
     ]
 )
