@@ -1,13 +1,12 @@
 import os
+import litellm
 from google.adk.agents import LlmAgent, ParallelAgent, LoopAgent, SequentialAgent
 from pydantic import BaseModel
 from typing import List, Dict, Literal
 from google.adk.models.lite_llm import LiteLlm
 from google.adk.tools import ToolContext
-from google.genai import types
-from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParameters
+from mcp_brand_agent.tool_helper import search_web
 
-# from google.adk.planners.built_in_planner import BuiltInPlanner
 class SentimentBreakdown(BaseModel):
     positive: float
     negative: float
@@ -58,14 +57,16 @@ class BrandSentimentReport(BaseModel):
 #     api_key=os.getenv("OPENAI_API_KEY")
 # )
 model_extract = model_analysis = LiteLlm(
-    model="gpt-4.1",
+    model="o4-mini",
     api_key=os.getenv("OPENAI_API_KEY")
 )
+# model_extract = model_analysis = "gemini-2.5-flash-preview-05-20"
 # model_qwen = LiteLlm(
 #     model="together_ai/Qwen/Qwen2.5-72B-Instruct-Turbo",
 #     api_key=os.getenv("TOGETHERAI_API_KEY"),
 #     # max_tokens=93762
 # )
+litellm._turn_on_debug()
 
 def exit_loop(tool_context: ToolContext):
   """Call this function ONLY when the critique indicates no further changes are needed, signaling the iterative process should end."""
@@ -119,17 +120,7 @@ IMPORTANT:
 - platform_name must be exactly "Twitter"
 - Return ONLY the JSON object, no other text
     """,
-    tools=[MCPToolset(
-            connection_params=StdioServerParameters(
-                command='npx',
-                args=["-y", "@brightdata/mcp", os.path.abspath(TARGET_FOLDER_PATH)],
-                env={
-                    "API_TOKEN": os.getenv("MCP_TOKEN"),
-                    # "WEB_UNLOCKER_ZONE": "web_unlocker1",
-                    # "BROWSER_AUTH": "SBR_USER:SBR_PASS"
-                }
-            )
-        )],
+    tools=[search_web],
     # output_schema=SinglePlatformAnalysisReport,
     output_key="twitter_results",
     # generate_content_config=types.GenerateContentConfig(temperature=0.01),
@@ -221,17 +212,7 @@ IMPORTANT:
 - platform_name must be exactly "LinkedIn"
 - Return ONLY the JSON object, no other text
     """,
-    tools=[MCPToolset(
-            connection_params=StdioServerParameters(
-                command='npx',
-                args=["-y", "@brightdata/mcp", os.path.abspath(TARGET_FOLDER_PATH)],
-                env={
-                    "API_TOKEN": os.getenv("MCP_TOKEN"),
-                    # "WEB_UNLOCKER_ZONE": "web_unlocker1",
-                    # "BROWSER_AUTH": "SBR_USER:SBR_PASS"
-                }
-            )
-        )],
+    tools=[search_web],
     # output_schema=SinglePlatformAnalysisReport,
     output_key="linkedin_results",
     # generate_content_config=types.GenerateContentConfig(temperature=0.01),
@@ -322,17 +303,7 @@ IMPORTANT:
 - platform_name must be exactly "Reddit"
 - Return ONLY the JSON object, no other text
     """,
-    tools=[MCPToolset(
-            connection_params=StdioServerParameters(
-                command='npx',
-                args=["-y", "@brightdata/mcp", os.path.abspath(TARGET_FOLDER_PATH)],
-                env={
-                    "API_TOKEN": os.getenv("MCP_TOKEN"),
-                    # "WEB_UNLOCKER_ZONE": "web_unlocker1",
-                    # "BROWSER_AUTH": "SBR_USER:SBR_PASS"
-                }
-            )
-        )],
+    tools=[search_web],
     # output_schema=SinglePlatformAnalysisReport,
     output_key="reddit_results",
     # generate_content_config=types.GenerateContentConfig(temperature=0.01),
@@ -424,17 +395,7 @@ IMPORTANT:
 - platform_name must be exactly "News"
 - Return ONLY the JSON object, no other text
     """,
-    tools=[MCPToolset(
-            connection_params=StdioServerParameters(
-                command='npx',
-                args=["-y", "@brightdata/mcp", os.path.abspath(TARGET_FOLDER_PATH)],
-                env={
-                    "API_TOKEN": os.getenv("MCP_TOKEN"),
-                    # "WEB_UNLOCKER_ZONE": "web_unlocker1",
-                    # "BROWSER_AUTH": "SBR_USER:SBR_PASS"
-                }
-            )
-        )],
+    tools=[search_web],
     # output_schema=SinglePlatformAnalysisReport,
     output_key="news_results",
     # generate_content_config=types.GenerateContentConfig(temperature=0.01),

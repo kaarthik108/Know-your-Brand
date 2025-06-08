@@ -1,9 +1,6 @@
-google-adk==1.2.1
+google-adk==1.2.0
 python-dotenv
 pydantic
 litellm==1.72.2
 fastapi
 uvicorn[standard]
-asyncpg
-langchain-mcp-adapters==0.1.1
-langchain-community==0.3.24
