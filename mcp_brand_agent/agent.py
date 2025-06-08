@@ -6,6 +6,9 @@ from typing import List, Dict, Literal
 from google.adk.models.lite_llm import LiteLlm
 from google.adk.tools import ToolContext
 from mcp_brand_agent.tool_helper import search_web
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class SentimentBreakdown(BaseModel):
     positive: float
@@ -56,9 +59,13 @@ class BrandSentimentReport(BaseModel):
 #     model="o4-mini",
 #     api_key=os.getenv("OPENAI_API_KEY")
 # )
+if not os.getenv("OPENAI_API_KEY"):
+    raise ValueError("OPENAI_API_KEY is not set")
+
 model_extract = model_analysis = LiteLlm(
     model="o4-mini",
-    api_key=os.getenv("OPENAI_API_KEY")
+    api_key=os.getenv("OPENAI_API_KEY"),
+    max_tokens=93762
 )
 # model_extract = model_analysis = "gemini-2.5-flash-preview-05-20"
 # model_qwen = LiteLlm(

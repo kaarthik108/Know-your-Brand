@@ -21,9 +21,9 @@ RUN apt-get update && \
 COPY requirements.txt .
 RUN uv pip install --system -r requirements.txt
 
-ADD . /app
-ENV PATH="/app/.venv/bin:$PATH"
+COPY . /app
 
+ENV PORT=8080
 EXPOSE 8080
 
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port 8080"]
+CMD ["python", "main.py"]

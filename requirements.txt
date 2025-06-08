@@ -5,3 +5,4 @@ litellm==1.72.2
 fastapi
 uvicorn[standard]
 deprecated
+psycopg2-binary
